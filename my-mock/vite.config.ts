@@ -1,8 +1,11 @@
-import { webcrypto as crypto } from 'node:crypto';
-if (!globalThis.crypto) globalThis.crypto = crypto;
+
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+
+// Polyfill for crypto.getRandomValues in Node.js
+
+
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -17,6 +20,7 @@ export default defineConfig({
     open: true,
   },
   build: {
+
     outDir: 'dist',
     sourcemap: true,
   },

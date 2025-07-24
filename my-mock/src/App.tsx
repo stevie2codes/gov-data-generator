@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ConfigPanel } from './components/ConfigPanel';
 import { DataPreview } from './components/DataPreview';
 import { generateMockData } from './components/DataGenerator';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { Toaster } from './components/ui/sonner';
 import { Building2, Sparkles, FileJson, FileText, ShoppingCart, Package } from 'lucide-react';
 
@@ -13,10 +13,10 @@ export default function App() {
 
   const handleGenerate = async (type: string, count: number, fields: string[]) => {
     setIsGenerating(true);
-    
+
     // Simulate AI processing delay
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-    
+
     try {
       const data = generateMockData(type, count, fields);
       setGeneratedData(data);
@@ -32,10 +32,10 @@ export default function App() {
   const handlePreview = async (type: string, count: number, fields: string[]) => {
     const previewCount = Math.min(count, 5);
     setIsGenerating(true);
-    
+
     // Simulate AI processing delay
     await new Promise(resolve => setTimeout(resolve, 500));
-    
+
     try {
       const data = generateMockData(type, previewCount, fields);
       setGeneratedData(data);
@@ -64,7 +64,7 @@ export default function App() {
             <h1 className="text-3xl">Government Data Generator</h1>
           </div>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Generate comprehensive mock data for government applications, civic tech projects, and municipal ERP systems. 
+            Generate comprehensive mock data for government applications, civic tech projects, and municipal ERP systems.
             Create test datasets for citizens, employees, permits, licenses, procurement, inventory, and financial operations.
           </p>
         </div>
