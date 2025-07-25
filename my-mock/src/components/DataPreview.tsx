@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Download, FileJson, FileSpreadsheet } from 'lucide-react';
+import { FileJson, FileSpreadsheet } from 'lucide-react';
 import { convertToCSV } from './DataGenerator';
 
 interface DataPreviewProps {
@@ -30,7 +30,7 @@ export function DataPreview({ data, dataType, onDownload }: DataPreviewProps) {
 
   const handleDownload = (format: 'json' | 'csv') => {
     const timestamp = new Date().toISOString().split('T')[0];
-    
+
     if (format === 'json') {
       const content = JSON.stringify(data, null, 2);
       downloadFile(content, `${dataType}-${timestamp}.json`, 'application/json');
@@ -38,7 +38,7 @@ export function DataPreview({ data, dataType, onDownload }: DataPreviewProps) {
       const content = convertToCSV(data);
       downloadFile(content, `${dataType}-${timestamp}.csv`, 'text/csv');
     }
-    
+
     onDownload(format);
   };
 
@@ -51,17 +51,17 @@ export function DataPreview({ data, dataType, onDownload }: DataPreviewProps) {
             <Badge variant="secondary">{data.length} records</Badge>
           </div>
           <div className="flex gap-2">
-            <Button 
-              onClick={() => handleDownload('json')} 
-              variant="outline" 
+            <Button
+              onClick={() => handleDownload('json')}
+              variant="outline"
               size="sm"
             >
               <FileJson className="h-4 w-4 mr-2" />
               JSON
             </Button>
-            <Button 
-              onClick={() => handleDownload('csv')} 
-              variant="outline" 
+            <Button
+              onClick={() => handleDownload('csv')}
+              variant="outline"
               size="sm"
             >
               <FileSpreadsheet className="h-4 w-4 mr-2" />
@@ -87,7 +87,7 @@ export function DataPreview({ data, dataType, onDownload }: DataPreviewProps) {
                 <tr key={index} className="border-b border-border/30">
                   {headers.map((header) => (
                     <td key={header} className="p-2 text-sm">
-                      {typeof row[header] === 'boolean' 
+                      {typeof row[header] === 'boolean'
                         ? (row[header] ? 'Yes' : 'No')
                         : row[header]?.toString() || '-'}
                     </td>

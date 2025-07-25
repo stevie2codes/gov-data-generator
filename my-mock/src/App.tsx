@@ -4,7 +4,7 @@ import { DataPreview } from './components/DataPreview';
 import { generateMockData } from './components/DataGenerator';
 import { toast } from 'sonner';
 import { Toaster } from './components/ui/sonner';
-import { Building2, Sparkles, FileJson, FileText, ShoppingCart, Package } from 'lucide-react';
+import { Building2, Sparkles, FileText, ShoppingCart, Package } from 'lucide-react';
 
 export default function App() {
   const [generatedData, setGeneratedData] = useState<any[]>([]);
