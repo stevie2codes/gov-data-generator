@@ -1,0 +1,106 @@
+{
+  "name": "Government Data Generator",
+  "description": "Generate realistic mock data for government applications and civic tech projects",
+  "version": "1.0.0",
+  "base_url": "http://localhost:3002",
+  "functions": [
+    {
+      "name": "generate_government_data",
+      "description": "Generate mock government data for testing and development purposes",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "dataType": {
+            "type": "string",
+            "description": "Type of government data to generate",
+            "enum": [
+              "citizens",
+              "employees",
+              "services",
+              "contracts",
+              "assets",
+              "budget",
+              "permits",
+              "licenses",
+              "purchaseOrders",
+              "invoices",
+              "inventory",
+              "workOrders"
+            ]
+          },
+          "count": {
+            "type": "number",
+            "description": "Number of records to generate (1-1000)",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "fields": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Specific fields to include in the generated data"
+          }
+        },
+        "required": ["dataType", "count"]
+      }
+    },
+    {
+      "name": "list_available_data_types",
+      "description": "Get a list of all available government data types",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "get_data_type_info",
+      "description": "Get information about a specific data type and its available fields",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "dataType": {
+            "type": "string",
+            "description": "The data type to get information about"
+          }
+        },
+        "required": ["dataType"]
+      }
+    }
+  ],
+  "examples": [
+    {
+      "user": "Generate 10 citizen records with SSN and voting status",
+      "assistant": "I'll generate 10 citizen records with SSN and voting status for you.",
+      "function_call": {
+        "name": "generate_government_data",
+        "arguments": {
+          "dataType": "citizens",
+          "count": 10,
+          "fields": ["firstName", "lastName", "ssn", "voterRegistered"]
+        }
+      }
+    },
+    {
+      "user": "What government data types are available?",
+      "assistant": "Let me check what government data types are available.",
+      "function_call": {
+        "name": "list_available_data_types",
+        "arguments": {}
+      }
+    },
+    {
+      "user": "Show me the fields available for employee data",
+      "assistant": "I'll get the field information for employee data.",
+      "function_call": {
+        "name": "get_data_type_info",
+        "arguments": {
+          "dataType": "employees"
+        }
+      }
+    }
+  ],
+  "integration_instructions": {
+    "chatgpt": "Add these functions to your ChatGPT function calling configuration",
+    "claude": "Use these function definitions with Claude's function calling feature",
+    "custom_bot": "Implement function calling using the provided schema"
+  }
+} 

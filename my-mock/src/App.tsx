@@ -70,9 +70,9 @@ export default function App() {
         </div>
 
         {/* Main Content */}
-        <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {/* Configuration Panel */}
-          <div className="lg:w-1/3">
+          <div className="lg:col-span-1">
             <ConfigPanel
               onGenerate={handleGenerate}
               onPreview={handlePreview}
@@ -81,7 +81,7 @@ export default function App() {
           </div>
 
           {/* Data Preview */}
-          <div className="lg:w-2/3">
+          <div className="lg:col-span-2">
             {isGenerating ? (
               <div className="flex items-center justify-center h-64 bg-card rounded-lg border">
                 <div className="text-center space-y-4">
@@ -113,46 +113,6 @@ export default function App() {
                 </div>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Features */}
-        <div className="mt-16 grid md:grid-cols-4 gap-6 max-w-5xl mx-auto">
-          <div className="text-center p-6 rounded-lg bg-card border">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Building2 className="h-6 w-6 text-primary" />
-            </div>
-            <h3 className="mb-2">Core Government Data</h3>
-            <p className="text-sm text-muted-foreground">
-              Citizens, employees, public services, contracts, assets, and budget records
-            </p>
-          </div>
-          <div className="text-center p-6 rounded-lg bg-card border">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FileText className="h-6 w-6 text-primary" />
-            </div>
-            <h3 className="mb-2">Permits & Licensing</h3>
-            <p className="text-sm text-muted-foreground">
-              Building permits, business licenses, applications, and regulatory compliance data
-            </p>
-          </div>
-          <div className="text-center p-6 rounded-lg bg-card border">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <ShoppingCart className="h-6 w-6 text-primary" />
-            </div>
-            <h3 className="mb-2">ERP & Procurement</h3>
-            <p className="text-sm text-muted-foreground">
-              Purchase orders, invoices, vendor management, and financial operations
-            </p>
-          </div>
-          <div className="text-center p-6 rounded-lg bg-card border">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Package className="h-6 w-6 text-primary" />
-            </div>
-            <h3 className="mb-2">Operations Management</h3>
-            <p className="text-sm text-muted-foreground">
-              Inventory tracking, work orders, and municipal asset management systems
-            </p>
           </div>
         </div>
       </div>

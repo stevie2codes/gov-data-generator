@@ -262,7 +262,7 @@ export function ConfigPanel({
 
   const currentConfig =
     dataTypeConfigs[
-      selectedType as keyof typeof dataTypeConfigs
+    selectedType as keyof typeof dataTypeConfigs
     ];
 
   return (
@@ -364,7 +364,7 @@ export function ConfigPanel({
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <Button
             onClick={() =>
               onPreview(
@@ -374,7 +374,6 @@ export function ConfigPanel({
               )
             }
             variant="outline"
-            className="flex-1"
             disabled={
               isGenerating || selectedFields.length === 0
             }
@@ -393,7 +392,6 @@ export function ConfigPanel({
             disabled={
               isGenerating || selectedFields.length === 0
             }
-            className="flex-1"
           >
             <Download className="h-4 w-4 mr-2" />
             {isGenerating ? "Generating..." : "Generate"}
