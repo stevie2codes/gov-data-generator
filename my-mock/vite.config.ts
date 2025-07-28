@@ -13,6 +13,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: process.env.NODE_ENV === 'production' ? '/playground/' : '/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -23,7 +24,6 @@ export default defineConfig({
     open: true,
   },
   build: {
-
     outDir: 'dist',
     sourcemap: true,
   },

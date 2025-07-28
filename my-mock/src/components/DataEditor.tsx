@@ -228,8 +228,7 @@ export function DataEditor({ data, dataType, onSave, onDownload, onBack }: DataE
           <Input
             value={value || ''}
             onChange={(e) => updateField(recordId, field, e.target.value)}
-            className={`min-w-[120px] ${hasError ? 'border-red-500' : ''}`}
-            size="sm"
+            className={`min-w-[120px] h-8 ${hasError ? 'border-red-500' : ''}`}
           />
           {hasError && (
             <span className="text-xs text-red-500">{hasError}</span>

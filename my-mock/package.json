@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 10",
     "type-check": "tsc --noEmit",
     "mcp": "node mcp-server-simple.js",
@@ -81,6 +83,7 @@
     "eslint": "^9.13.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.13",
+    "gh-pages": "^6.3.0",
     "postcss": "^8.4.47",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "tailwindcss": "^3.4.17",
@@ -104,10 +107,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/government-data-generator.git"
+    "url": "https://github.com/stevie2codes/playground.git"
   },
   "bugs": {
-    "url": "https://github.com/your-org/government-data-generator/issues"
+    "url": "https://github.com/stevie2codes/playground/issues"
   },
-  "homepage": "https://github.com/your-org/government-data-generator#readme"
+  "homepage": "https://stevie2codes.github.io/playground/"
 }
