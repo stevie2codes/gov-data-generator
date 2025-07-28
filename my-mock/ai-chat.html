@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Government Data Generator - AI Chat</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background: #007bff;
+            color: white;
+            margin-left: auto;
+        }
+
+        .ai-message {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .input-container {
+            display: flex;
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #dee2e6;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        #sendButton {
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #sendButton:hover {
+            background: #0056b3;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .data-preview {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .examples {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .examples h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+
+        .example {
+            background: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin: 5px 0;
+            cursor: pointer;
+            border: 1px solid #bbdefb;
+        }
+
+        .example:hover {
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="header">
+            <h1>🤖 Government Data Generator AI</h1>
+            <p>Ask me to generate government data!</p>
+        </div>
+
+        <div class="examples">
+            <h3>💡 Try these examples:</h3>
+            <div class="example" onclick="sendMessage('Generate 10 citizen records with SSN and voting status')">
+                "Generate 10 citizen records with SSN and voting status"
+            </div>
+            <div class="example" onclick="sendMessage('Create 5 employee records with department and salary')">
+                "Create 5 employee records with department and salary"
+            </div>
+            <div class="example" onclick="sendMessage('What government data types are available?')">
+                "What government data types are available?"
+            </div>
+            <div class="example" onclick="sendMessage('Show me the fields for permits data')">
+                "Show me the fields for permits data"
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message ai-message">
+                👋 Hi! I'm your Government Data Generator AI. I can help you create realistic mock data for government
+                applications. Try asking me to generate citizens, employees, permits, or any other government data type!
+            </div>
+        </div>
+
+        <div class="input-container">
+            <input type="text" id="messageInput" placeholder="Ask me to generate government data..."
+                onkeypress="handleKeyPress(event)">
+            <button id="sendButton" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3002';
+
+        function addMessage(message, isUser = false) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            messageDiv.textContent = message;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function addDataPreview(data) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const dataDiv = document.createElement('div');
+            dataDiv.className = 'message ai-message';
+            dataDiv.innerHTML = `
+                <div>📊 Generated Data:</div>
+                <div class="data-preview">${JSON.stringify(data, null, 2)}</div>
+            `;
+            messagesDiv.appendChild(dataDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function addLoading() {
+            const messagesDiv = document.getElementById('chatMessages');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message ai-message loading';
+            loadingDiv.id = 'loadingMessage';
+            loadingDiv.textContent = '🤔 Thinking...';
+            messagesDiv.appendChild(loadingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function removeLoading() {
+            const loadingDiv = document.getElementById('loadingMessage');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+
+        async function callAI(message) {
+            // Simple keyword-based parsing
+            const lowerMessage = message.toLowerCase();
+
+            if (lowerMessage.includes('citizen') || lowerMessage.includes('customer')) {
+                const count = extractNumber(message) || 5;
+                const fields = extractFields(message);
+
+                return await callFunction('generate_government_data', {
+                    dataType: 'citizens',
+                    count: count,
+                    fields: fields || ['firstName', 'lastName', 'city', 'state']
+                });
+            }
+
+            if (lowerMessage.includes('employee')) {
+                const count = extractNumber(message) || 5;
+                const fields = extractFields(message);
+
+                return await callFunction('generate_government_data', {
+                    dataType: 'employees',
+                    count: count,
+                    fields: fields || ['firstName', 'lastName', 'department', 'salary']
+                });
+            }
+
+            if (lowerMessage.includes('type') && lowerMessage.includes('available')) {
+                return await callFunction('list_available_data_types', {});
+            }
+
+            if (lowerMessage.includes('field') && lowerMessage.includes('permit')) {
+                return await callFunction('get_data_type_info', {
+                    dataType: 'permits'
+                });
+            }
+
+            // Default: try to generate citizens
+            return await callFunction('generate_government_data', {
+                dataType: 'citizens',
+                count: 5,
+                fields: ['firstName', 'lastName', 'city', 'state']
+            });
+        }
+
+        function extractNumber(message) {
+            const match = message.match(/(\d+)/);
+            return match ? parseInt(match[1]) : null;
+        }
+
+        function extractFields(message) {
+            const fields = [];
+            if (message.toLowerCase().includes('ssn')) fields.push('ssn');
+            if (message.toLowerCase().includes('voting') || message.toLowerCase().includes('voter')) fields.push('voterRegistered');
+            if (message.toLowerCase().includes('email')) fields.push('email');
+            if (message.toLowerCase().includes('department')) fields.push('department');
+            if (message.toLowerCase().includes('salary')) fields.push('salary');
+            return fields.length > 0 ? fields : null;
+        }
+
+        async function callFunction(functionName, args) {
+            try {
+                const response = await fetch(`${API_BASE}/call`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        function_name: functionName,
+                        arguments: args
+                    })
+                });
+
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Error calling function:', error);
+                return { error: error.message };
+            }
+        }
+
+        async function sendMessage(customMessage = null) {
+            const input = document.getElementById('messageInput');
+            const message = customMessage || input.value.trim();
+
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, true);
+
+            // Clear input
+            if (!customMessage) {
+                input.value = '';
+            }
+
+            // Add loading
+            addLoading();
+
+            try {
+                const result = await callAI(message);
+                removeLoading();
+
+                if (result.success) {
+                    if (result.data) {
+                        addMessage(`✅ ${result.message}`);
+                        addDataPreview(result.data);
+                    } else if (result.dataTypes) {
+                        addMessage(`📋 Available data types: ${result.dataTypes.join(', ')}`);
+                    } else if (result.availableFields) {
+                        addMessage(`📋 Available fields: ${result.availableFields.join(', ')}`);
+                    } else {
+                        addMessage(`✅ ${result.message}`);
+                    }
+                } else {
+                    addMessage(`❌ Error: ${result.error || 'Something went wrong'}`);
+                }
+            } catch (error) {
+                removeLoading();
+                addMessage(`❌ Error: ${error.message}`);
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+
+</html>
