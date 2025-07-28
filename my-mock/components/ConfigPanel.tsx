@@ -20,14 +20,14 @@ import { Building2, Download, Eye } from "lucide-react";
 
 interface ConfigPanelProps {
   onGenerate: (
-    type: string,
-    count: number,
-    fields: string[],
+    _type: string,
+    _count: number,
+    _fields: string[],
   ) => void;
   onPreview: (
-    type: string,
-    count: number,
-    fields: string[],
+    _type: string,
+    _count: number,
+    _fields: string[],
   ) => void;
   isGenerating: boolean;
 }

@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { ConfigPanel } from './components/ConfigPanel';
 import { DataPreview } from './components/DataPreview';
+import { DataEditor } from './components/DataEditor';
 import { generateMockData } from './components/DataGenerator';
 import { toast } from 'sonner';
 import { Toaster } from './components/ui/sonner';
-import { Building2, Sparkles, FileText, ShoppingCart, Package } from 'lucide-react';
+import { Building2, Sparkles } from 'lucide-react';
 
 export default function App() {
   const [generatedData, setGeneratedData] = useState<any[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentDataType, setCurrentDataType] = useState('');
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const handleGenerate = async (type: string, count: number, fields: string[]) => {
     setIsGenerating(true);
@@ -22,7 +24,7 @@ export default function App() {
       setGeneratedData(data);
       setCurrentDataType(type);
       toast.success(`Generated ${count} ${type} records successfully!`);
-    } catch (error) {
+    } catch {
       toast.error('Failed to generate data. Please try again.');
     } finally {
       setIsGenerating(false);
@@ -41,7 +43,7 @@ export default function App() {
       setGeneratedData(data);
       setCurrentDataType(type);
       toast.success(`Preview generated for ${type}!`);
-    } catch (error) {
+    } catch {
       toast.error('Failed to generate preview. Please try again.');
     } finally {
       setIsGenerating(false);
@@ -50,6 +52,19 @@ export default function App() {
 
   const handleDownload = (format: 'json' | 'csv') => {
     toast.success(`Downloaded ${generatedData.length} records as ${format.toUpperCase()}!`);
+  };
+
+  const handleEditMode = () => {
+    setIsEditMode(true);
+  };
+
+  const handleSaveEdits = (editedData: any[]) => {
+    setGeneratedData(editedData);
+    setIsEditMode(false);
+  };
+
+  const handleBackToPreview = () => {
+    setIsEditMode(false);
   };
 
   return (
@@ -80,7 +95,7 @@ export default function App() {
             />
           </div>
 
-          {/* Data Preview */}
+          {/* Data Preview/Editor */}
           <div className="lg:col-span-2">
             {isGenerating ? (
               <div className="flex items-center justify-center h-64 bg-card rounded-lg border">
@@ -97,11 +112,22 @@ export default function App() {
                 </div>
               </div>
             ) : generatedData.length > 0 ? (
-              <DataPreview
-                data={generatedData}
-                dataType={currentDataType}
-                onDownload={handleDownload}
-              />
+              isEditMode ? (
+                <DataEditor
+                  data={generatedData}
+                  dataType={currentDataType}
+                  onSave={handleSaveEdits}
+                  onDownload={handleDownload}
+                  onBack={handleBackToPreview}
+                />
+              ) : (
+                <DataPreview
+                  data={generatedData}
+                  dataType={currentDataType}
+                  onDownload={handleDownload}
+                  onEdit={handleEditMode}
+                />
+              )
             ) : (
               <div className="flex items-center justify-center h-64 bg-card rounded-lg border border-dashed">
                 <div className="text-center space-y-2">

@@ -1,13 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Download, FileJson, FileSpreadsheet } from 'lucide-react';
+import { FileJson, FileSpreadsheet } from 'lucide-react';
 import { convertToCSV } from './DataGenerator';
 
 interface DataPreviewProps {
   data: any[];
   dataType: string;
-  onDownload: (format: 'json' | 'csv') => void;
+  onDownload: (_format: 'json' | 'csv') => void;
 }
 
 export function DataPreview({ data, dataType, onDownload }: DataPreviewProps) {
@@ -28,10 +28,10 @@ export function DataPreview({ data, dataType, onDownload }: DataPreviewProps) {
     URL.revokeObjectURL(url);
   };
 
-  const handleDownload = (format: 'json' | 'csv') => {
+  const handleDownload = (_format: 'json' | 'csv') => {
     const timestamp = new Date().toISOString().split('T')[0];
     
-    if (format === 'json') {
+    if (_format === 'json') {
       const content = JSON.stringify(data, null, 2);
       downloadFile(content, `${dataType}-${timestamp}.json`, 'application/json');
     } else {
@@ -39,7 +39,7 @@ export function DataPreview({ data, dataType, onDownload }: DataPreviewProps) {
       downloadFile(content, `${dataType}-${timestamp}.csv`, 'text/csv');
     }
     
-    onDownload(format);
+    onDownload(_format);
   };
 
   return (

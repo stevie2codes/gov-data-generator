@@ -1,16 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { FileJson, FileSpreadsheet } from 'lucide-react';
+import { FileJson, FileSpreadsheet, Edit3 } from 'lucide-react';
 import { convertToCSV } from './DataGenerator';
 
 interface DataPreviewProps {
   data: any[];
   dataType: string;
-  onDownload: (format: 'json' | 'csv') => void;
+  onDownload: (_format: 'json' | 'csv') => void;
+  onEdit?: () => void;
 }
 
-export function DataPreview({ data, dataType, onDownload }: DataPreviewProps) {
+export function DataPreview({ data, dataType, onDownload, onEdit }: DataPreviewProps) {
   if (data.length === 0) return null;
 
   const headers = Object.keys(data[0]);
@@ -28,10 +29,10 @@ export function DataPreview({ data, dataType, onDownload }: DataPreviewProps) {
     URL.revokeObjectURL(url);
   };
 
-  const handleDownload = (format: 'json' | 'csv') => {
+  const handleDownload = (_format: 'json' | 'csv') => {
     const timestamp = new Date().toISOString().split('T')[0];
 
-    if (format === 'json') {
+    if (_format === 'json') {
       const content = JSON.stringify(data, null, 2);
       downloadFile(content, `${dataType}-${timestamp}.json`, 'application/json');
     } else {
@@ -39,7 +40,7 @@ export function DataPreview({ data, dataType, onDownload }: DataPreviewProps) {
       downloadFile(content, `${dataType}-${timestamp}.csv`, 'text/csv');
     }
 
-    onDownload(format);
+    onDownload(_format);
   };
 
   return (
@@ -51,6 +52,16 @@ export function DataPreview({ data, dataType, onDownload }: DataPreviewProps) {
             <Badge variant="secondary">{data.length} records</Badge>
           </div>
           <div className="flex gap-2">
+            {onEdit && (
+              <Button
+                onClick={onEdit}
+                variant="default"
+                size="sm"
+              >
+                <Edit3 className="h-4 w-4 mr-2" />
+                Edit Data
+              </Button>
+            )}
             <Button
               onClick={() => handleDownload('json')}
               variant="outline"
