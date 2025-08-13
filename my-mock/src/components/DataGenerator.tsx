@@ -304,19 +304,30 @@ export const generateMockData = (type: string, count: number, fields: string[]) 
 
       case 'balanceSheet':
         if (fields.includes('id')) record.id = i + 1;
-        if (fields.includes('accountNumber')) record.accountNumber = generateAccountNumber(record.category || 'assets');
+        
+        // Determine the section (Assets, Liabilities, or Equity) based on record position
+        let section: 'assets' | 'liabilities' | 'equity';
+        if (i < Math.floor(count / 3)) {
+          section = 'assets';
+        } else if (i < Math.floor((count * 2) / 3)) {
+          section = 'liabilities';
+        } else {
+          section = 'equity';
+        }
+        
+        if (fields.includes('accountNumber')) record.accountNumber = generateAccountNumber(section);
         if (fields.includes('accountName')) {
-          const category = assetCategories[Math.floor(Math.random() * assetCategories.length)];
-          record.category = category;
-          if (category.includes('Assets')) {
-            record.accountName = accountNames.assets[Math.floor(Math.random() * accountNames.assets.length)];
-          } else if (category.includes('Liabilities')) {
-            record.accountName = accountNames.liabilities[Math.floor(Math.random() * accountNames.liabilities.length)];
+          record.accountName = accountNames[section][Math.floor(Math.random() * accountNames[section].length)];
+        }
+        if (fields.includes('category')) {
+          if (section === 'assets') {
+            record.category = assetCategories[Math.floor(Math.random() * assetCategories.length)];
+          } else if (section === 'liabilities') {
+            record.category = ['Current Liabilities', 'Long-term Liabilities', 'Contingent Liabilities'][Math.floor(Math.random() * 3)];
           } else {
-            record.accountName = accountNames.equity[Math.floor(Math.random() * accountNames.equity.length)];
+            record.category = ['Contributed Capital', 'Retained Earnings', 'Treasury Stock', 'Accumulated Other Comprehensive Income'][Math.floor(Math.random() * 4)];
           }
         }
-        if (fields.includes('category')) record.category = assetCategories[Math.floor(Math.random() * assetCategories.length)];
         if (fields.includes('currentPeriod')) record.currentPeriod = generateFinancialAmount(10000, 5000000);
         if (fields.includes('priorPeriod')) record.priorPeriod = generateFinancialAmount(10000, 5000000);
         if (fields.includes('change')) record.change = parseFloat((record.currentPeriod - record.priorPeriod).toFixed(2));
