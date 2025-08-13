@@ -18,6 +18,18 @@ const businessTypes = ['Restaurant', 'Retail Store', 'Construction Company', 'Te
 const inventoryCategories = ['Office Supplies', 'Maintenance Equipment', 'IT Hardware', 'Vehicle Parts', 'Safety Equipment', 'Tools', 'Cleaning Supplies', 'Medical Supplies'];
 const workOrderTypes = ['Maintenance', 'Repair', 'Installation', 'Inspection', 'Cleaning', 'Upgrade', 'Emergency', 'Preventive'];
 
+// Financial statement data arrays
+const assetCategories = ['Current Assets', 'Fixed Assets', 'Intangible Assets', 'Investments'];
+const revenueCategories = ['Tax Revenue', 'Service Charges', 'Fines & Penalties', 'Intergovernmental', 'Investment Income', 'Other Revenue'];
+
+const accountNames = {
+  assets: ['Cash & Cash Equivalents', 'Accounts Receivable', 'Inventory', 'Prepaid Expenses', 'Investments', 'Property, Plant & Equipment', 'Accumulated Depreciation', 'Intangible Assets', 'Other Assets'],
+  liabilities: ['Accounts Payable', 'Accrued Liabilities', 'Deferred Revenue', 'Bonds Payable', 'Notes Payable', 'Pension Liabilities', 'Other Long-term Liabilities'],
+  equity: ['Fund Balance', 'Reserved Fund Balance', 'Unreserved Fund Balance', 'Designated Fund Balance'],
+  revenue: ['Property Taxes', 'Sales Taxes', 'Income Taxes', 'Utility Charges', 'Permit Fees', 'License Fees', 'Fines & Penalties', 'Investment Income'],
+  expenses: ['Salaries & Wages', 'Employee Benefits', 'Contract Services', 'Supplies', 'Utilities', 'Insurance', 'Depreciation', 'Interest Expense']
+};
+
 const generateRandomString = (length: number = 8) => {
   return Math.random().toString(36).substring(2, length + 2);
 };
@@ -68,6 +80,27 @@ const generateWorkOrderNumber = () => {
 
 const generateBudgetAmount = () => {
   return (Math.random() * 5000000 + 10000).toFixed(2);
+};
+
+const generateFinancialAmount = (min: number, max: number) => {
+  return parseFloat((Math.random() * (max - min) + min).toFixed(2));
+};
+
+const generateAccountNumber = (category: string) => {
+  const prefixes = {
+    'assets': '1000',
+    'liabilities': '2000',
+    'equity': '3000',
+    'revenue': '4000',
+    'expenses': '5000'
+  };
+  const prefix = prefixes[category as keyof typeof prefixes] || '0000';
+  return `${prefix}-${generateRandomNumber(100, 999)}`;
+};
+
+const generateFiscalYear = () => {
+  const currentYear = new Date().getFullYear();
+  return `${currentYear}-${currentYear + 1}`;
 };
 
 export const generateMockData = (type: string, count: number, fields: string[]) => {
@@ -267,6 +300,55 @@ export const generateMockData = (type: string, count: number, fields: string[]) 
         if (fields.includes('status')) record.status = ['Open', 'In Progress', 'Completed', 'On Hold', 'Cancelled'][Math.floor(Math.random() * 5)];
         if (fields.includes('estimatedCost')) record.estimatedCost = parseFloat((Math.random() * 10000 + 100).toFixed(2));
         if (fields.includes('completionDate')) record.completionDate = record.status === 'Completed' ? generateRandomDate(new Date(record.scheduledDate), new Date()).toISOString().split('T')[0] : null;
+        break;
+
+      case 'balanceSheet':
+        if (fields.includes('id')) record.id = i + 1;
+        if (fields.includes('accountNumber')) record.accountNumber = generateAccountNumber(record.category || 'assets');
+        if (fields.includes('accountName')) {
+          const category = assetCategories[Math.floor(Math.random() * assetCategories.length)];
+          record.category = category;
+          if (category.includes('Assets')) {
+            record.accountName = accountNames.assets[Math.floor(Math.random() * accountNames.assets.length)];
+          } else if (category.includes('Liabilities')) {
+            record.accountName = accountNames.liabilities[Math.floor(Math.random() * accountNames.liabilities.length)];
+          } else {
+            record.accountName = accountNames.equity[Math.floor(Math.random() * accountNames.equity.length)];
+          }
+        }
+        if (fields.includes('category')) record.category = assetCategories[Math.floor(Math.random() * assetCategories.length)];
+        if (fields.includes('currentPeriod')) record.currentPeriod = generateFinancialAmount(10000, 5000000);
+        if (fields.includes('priorPeriod')) record.priorPeriod = generateFinancialAmount(10000, 5000000);
+        if (fields.includes('change')) record.change = parseFloat((record.currentPeriod - record.priorPeriod).toFixed(2));
+        if (fields.includes('changePercent')) record.changePercent = parseFloat(((record.change / record.priorPeriod) * 100).toFixed(2));
+        if (fields.includes('fiscalYear')) record.fiscalYear = generateFiscalYear();
+        if (fields.includes('fund')) record.fund = ['General Fund', 'Special Revenue Fund', 'Capital Projects Fund', 'Debt Service Fund', 'Enterprise Fund'][Math.floor(Math.random() * 5)];
+        if (fields.includes('department')) record.department = departments[Math.floor(Math.random() * departments.length)];
+        if (fields.includes('notes')) record.notes = `Account balance as of ${new Date().toISOString().split('T')[0]}`;
+        break;
+
+      case 'incomeStatement':
+        if (fields.includes('id')) record.id = i + 1;
+        if (fields.includes('accountNumber')) record.accountNumber = generateAccountNumber(record.category || 'revenue');
+        if (fields.includes('accountName')) {
+          const category = revenueCategories[Math.floor(Math.random() * revenueCategories.length)];
+          record.category = category;
+          if (category.includes('Revenue')) {
+            record.accountName = accountNames.revenue[Math.floor(Math.random() * accountNames.revenue.length)];
+          } else {
+            record.accountName = accountNames.expenses[Math.floor(Math.random() * accountNames.expenses.length)];
+          }
+        }
+        if (fields.includes('category')) record.category = revenueCategories[Math.floor(Math.random() * revenueCategories.length)];
+        if (fields.includes('budgetedAmount')) record.budgetedAmount = generateFinancialAmount(10000, 2000000);
+        if (fields.includes('actualAmount')) record.actualAmount = generateFinancialAmount(8000, 1800000);
+        if (fields.includes('variance')) record.variance = parseFloat((record.actualAmount - record.budgetedAmount).toFixed(2));
+        if (fields.includes('variancePercent')) record.variancePercent = parseFloat(((record.variance / record.budgetedAmount) * 100).toFixed(2));
+        if (fields.includes('fiscalYear')) record.fiscalYear = generateFiscalYear();
+        if (fields.includes('period')) record.period = ['Q1', 'Q2', 'Q3', 'Q4', 'Annual'][Math.floor(Math.random() * 5)];
+        if (fields.includes('fund')) record.fund = ['General Fund', 'Special Revenue Fund', 'Capital Projects Fund', 'Debt Service Fund', 'Enterprise Fund'][Math.floor(Math.random() * 5)];
+        if (fields.includes('department')) record.department = departments[Math.floor(Math.random() * departments.length)];
+        if (fields.includes('notes')) record.notes = `Budget vs. actual for ${record.period} ${record.fiscalYear}`;
         break;
         
       default:

@@ -225,6 +225,41 @@ const dataTypeConfigs = {
       "completionDate",
     ],
   },
+  balanceSheet: {
+    name: "Balance Sheet",
+    fields: [
+      "id",
+      "accountNumber",
+      "accountName",
+      "category",
+      "currentPeriod",
+      "priorPeriod",
+      "change",
+      "changePercent",
+      "fiscalYear",
+      "fund",
+      "department",
+      "notes",
+    ],
+  },
+  incomeStatement: {
+    name: "Income Statement",
+    fields: [
+      "id",
+      "accountNumber",
+      "accountName",
+      "category",
+      "budgetedAmount",
+      "actualAmount",
+      "variance",
+      "variancePercent",
+      "fiscalYear",
+      "period",
+      "fund",
+      "department",
+      "notes",
+    ],
+  },
 };
 
 export function ConfigPanel({
@@ -317,11 +352,17 @@ export function ConfigPanel({
                 <SelectItem value="inventory">
                   Inventory Management
                 </SelectItem>
-                <SelectItem value="workOrders">
-                  Work Orders
-                </SelectItem>
-              </SelectContent>
-            </Select>
+                              <SelectItem value="workOrders">
+                Work Orders
+              </SelectItem>
+              <SelectItem value="balanceSheet">
+                Balance Sheet
+              </SelectItem>
+              <SelectItem value="incomeStatement">
+                Income Statement
+              </SelectItem>
+            </SelectContent>
+          </Select>
           </div>
 
           <div className="space-y-2">
