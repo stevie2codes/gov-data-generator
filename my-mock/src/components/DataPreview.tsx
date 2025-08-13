@@ -9,7 +9,6 @@ import {
   FileJson, 
   FileSpreadsheet, 
   Search, 
-  Filter, 
   Eye, 
   EyeOff,
   ChevronUp,
@@ -21,17 +20,16 @@ import {
   TrendingUp,
   TrendingDown,
   Settings,
-  RotateCcw,
   CheckCircle,
   Type,
   Hash,
   Calendar,
   Mail,
   Phone,
-  ChevronDown as ChevronDownIcon,
   X
 } from 'lucide-react';
 import { convertToCSV } from './DataGenerator';
+import { toast } from 'sonner';
 import {
   Table,
   TableBody,
@@ -83,7 +81,7 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
-  const [columnOperations, setColumnOperations] = useState<ColumnOperation[]>([]);
+
   const [columnModal, setColumnModal] = useState<ColumnEditModal>({
     isOpen: false,
     column: null,
@@ -352,7 +350,6 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
     });
     
     onDataChange(newData);
-    setColumnOperations(prev => [...prev, operation]);
     toast.success(`Applied ${op} operation to ${column} column`);
   };
 

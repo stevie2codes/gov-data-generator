@@ -17,12 +17,10 @@ import {
   Edit3, 
   Save, 
   X, 
-  Download, 
   Trash2,
   Eye,
   EyeOff,
   Settings,
-  RotateCcw,
   CheckCircle,
   Type,
   Hash,
@@ -37,7 +35,6 @@ interface DataEditorProps {
   data: any[];
   dataType: string;
   onSave: (editedData: any[]) => void;
-  onDownload: (format: 'json' | 'csv') => void;
   onBack: () => void;
 }
 
@@ -67,7 +64,7 @@ interface ColumnEditModal {
   targetType: string;
 }
 
-export function DataEditor({ data, dataType, onSave, onDownload, onBack }: DataEditorProps) {
+export function DataEditor({ data, dataType, onSave, onBack }: DataEditorProps) {
   const [editedData, setEditedData] = useState<any[]>(data);
   const [columnOperations, setColumnOperations] = useState<ColumnOperation[]>([]);
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
@@ -324,7 +321,7 @@ export function DataEditor({ data, dataType, onSave, onDownload, onBack }: DataE
                       variant="ghost"
                       className="h-6 w-6 p-0"
                     >
-                      <RotateCcw className="h-3 w-3" />
+                      <Settings className="h-3 w-3" />
                     </Button>
                   </div>
                   
@@ -345,9 +342,9 @@ export function DataEditor({ data, dataType, onSave, onDownload, onBack }: DataE
                         });
                       }
                     }}>
-                      <SelectTrigger size="sm">
-                        <SelectValue placeholder="Quick actions" />
-                      </SelectTrigger>
+                                      <SelectTrigger>
+                  <SelectValue placeholder="Quick actions" />
+                </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="uppercase">To Uppercase</SelectItem>
                         <SelectItem value="lowercase">To Lowercase</SelectItem>

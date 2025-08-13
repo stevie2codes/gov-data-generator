@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { ConfigPanel } from './components/ConfigPanel';
 import { DataPreview } from './components/DataPreview';
-import { DataEditor } from './components/DataEditor';
 import { generateMockData } from './components/DataGenerator';
 import { toast } from 'sonner';
 import { Toaster } from './components/ui/sonner';
