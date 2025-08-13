@@ -8,15 +8,8 @@ import {
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
 import { Checkbox } from "./ui/checkbox";
-import { Building2, Download, Eye } from "lucide-react";
+import { Building2, Download, Eye, ChevronDown, ChevronRight } from "lucide-react";
 
 interface ConfigPanelProps {
   onGenerate: (
@@ -32,273 +25,138 @@ interface ConfigPanelProps {
   isGenerating: boolean;
 }
 
+// Simple data type configurations with basic categorization
 const dataTypeConfigs = {
   citizens: {
     name: "Citizens",
-    fields: [
-      "id",
-      "firstName",
-      "lastName",
-      "ssn",
-      "dateOfBirth",
-      "address",
-      "city",
-      "state",
-      "zipCode",
-      "phone",
-      "voterRegistered",
-    ],
+    category: "👥 People & Citizens",
+    description: "Resident information and voter registration",
+    fields: ["id", "firstName", "lastName", "ssn", "dateOfBirth", "address", "city", "state", "zipCode", "phone", "voterRegistered"],
   },
   employees: {
     name: "Government Employees",
-    fields: [
-      "id",
-      "employeeId",
-      "firstName",
-      "lastName",
-      "department",
-      "position",
-      "hireDate",
-      "salary",
-      "email",
-      "phone",
-      "clearanceLevel",
-    ],
+    category: "👥 People & Citizens",
+    description: "Staff records and employment information",
+    fields: ["id", "employeeId", "firstName", "lastName", "department", "position", "hireDate", "salary", "email", "phone", "clearanceLevel"],
   },
   services: {
     name: "Public Services",
-    fields: [
-      "id",
-      "serviceName",
-      "department",
-      "description",
-      "isActive",
-      "budget",
-      "contactPhone",
-      "website",
-      "hoursOfOperation",
-    ],
+    category: "🏢 Operations & Services",
+    description: "Municipal services and programs",
+    fields: ["id", "serviceName", "department", "description", "isActive", "budget", "contactPhone", "website", "hoursOfOperation"],
   },
   contracts: {
     name: "Government Contracts",
-    fields: [
-      "id",
-      "contractNumber",
-      "vendor",
-      "contractType",
-      "value",
-      "startDate",
-      "endDate",
-      "status",
-      "department",
-      "description",
-    ],
-  },
-  assets: {
-    name: "Municipal Assets",
-    fields: [
-      "id",
-      "assetTag",
-      "assetType",
-      "description",
-      "department",
-      "purchaseDate",
-      "purchaseValue",
-      "currentValue",
-      "condition",
-      "location",
-      "serialNumber",
-    ],
-  },
-  budget: {
-    name: "Budget Records",
-    fields: [
-      "id",
-      "fiscalYear",
-      "department",
-      "category",
-      "budgetedAmount",
-      "spentAmount",
-      "remainingAmount",
-      "percentSpent",
-      "lastUpdated",
-      "status",
-    ],
-  },
-  permits: {
-    name: "Permits & Applications",
-    fields: [
-      "id",
-      "permitNumber",
-      "permitType",
-      "applicantName",
-      "propertyAddress",
-      "applicationDate",
-      "issueDate",
-      "expirationDate",
-      "status",
-      "feeAmount",
-      "inspector",
-      "description",
-    ],
-  },
-  licenses: {
-    name: "Business Licenses",
-    fields: [
-      "id",
-      "licenseNumber",
-      "licenseType",
-      "businessName",
-      "ownerName",
-      "businessAddress",
-      "applicationDate",
-      "issueDate",
-      "renewalDate",
-      "status",
-      "annualFee",
-      "phone",
-    ],
-  },
-  purchaseOrders: {
-    name: "Purchase Orders",
-    fields: [
-      "id",
-      "poNumber",
-      "vendor",
-      "department",
-      "description",
-      "orderDate",
-      "requestedBy",
-      "totalAmount",
-      "status",
-      "deliveryDate",
-      "approvedBy",
-    ],
-  },
-  invoices: {
-    name: "Invoices & Payments",
-    fields: [
-      "id",
-      "invoiceNumber",
-      "vendor",
-      "poNumber",
-      "invoiceDate",
-      "dueDate",
-      "amount",
-      "status",
-      "department",
-      "description",
-      "paymentDate",
-    ],
-  },
-  inventory: {
-    name: "Inventory Management",
-    fields: [
-      "id",
-      "itemCode",
-      "itemName",
-      "category",
-      "description",
-      "quantity",
-      "unitPrice",
-      "totalValue",
-      "location",
-      "reorderLevel",
-      "supplier",
-      "lastUpdated",
-    ],
+    category: "🏢 Operations & Services",
+    description: "Vendor contracts and agreements",
+    fields: ["id", "contractNumber", "vendor", "contractType", "value", "startDate", "endDate", "status", "department", "description"],
   },
   workOrders: {
     name: "Work Orders",
-    fields: [
-      "id",
-      "workOrderNumber",
-      "workOrderType",
-      "description",
-      "location",
-      "requestDate",
-      "scheduledDate",
-      "assignedTo",
-      "priority",
-      "status",
-      "estimatedCost",
-      "completionDate",
-    ],
+    category: "🏢 Operations & Services",
+    description: "Maintenance and service requests",
+    fields: ["id", "workOrderNumber", "workOrderType", "description", "location", "requestDate", "scheduledDate", "assignedTo", "priority", "status", "estimatedCost", "completionDate"],
   },
   balanceSheet: {
     name: "Balance Sheet",
-    fields: [
-      "id",
-      "accountNumber",
-      "accountName",
-      "category",
-      "currentPeriod",
-      "priorPeriod",
-      "change",
-      "changePercent",
-      "fiscalYear",
-      "fund",
-      "department",
-      "notes",
-    ],
+    category: "💰 Financial & Accounting",
+    description: "Assets, liabilities, and equity positions",
+    fields: ["id", "accountNumber", "accountName", "category", "currentPeriod", "priorPeriod", "change", "changePercent", "fiscalYear", "fund", "department", "notes"],
   },
   incomeStatement: {
     name: "Income Statement",
-    fields: [
-      "id",
-      "accountNumber",
-      "accountName",
-      "category",
-      "budgetedAmount",
-      "actualAmount",
-      "variance",
-      "variancePercent",
-      "fiscalYear",
-      "period",
-      "fund",
-      "department",
-      "notes",
-    ],
+    category: "💰 Financial & Accounting",
+    description: "Revenue, expenses, and budget variance analysis",
+    fields: ["id", "accountNumber", "accountName", "category", "budgetedAmount", "actualAmount", "variance", "variancePercent", "fiscalYear", "period", "fund", "department", "notes"],
+  },
+  budget: {
+    name: "Budget Records",
+    category: "💰 Financial & Accounting",
+    description: "Budget planning and spending tracking",
+    fields: ["id", "fiscalYear", "department", "category", "budgetedAmount", "spentAmount", "remainingAmount", "percentSpent", "lastUpdated", "status"],
+  },
+  purchaseOrders: {
+    name: "Purchase Orders",
+    category: "💰 Financial & Accounting",
+    description: "Procurement and purchasing records",
+    fields: ["id", "poNumber", "vendor", "department", "description", "orderDate", "requestedBy", "totalAmount", "status", "deliveryDate", "approvedBy"],
+  },
+  invoices: {
+    name: "Invoices & Payments",
+    category: "💰 Financial & Accounting",
+    description: "Billing and payment processing",
+    fields: ["id", "invoiceNumber", "vendor", "poNumber", "invoiceDate", "dueDate", "amount", "status", "department", "description", "paymentDate"],
+  },
+  permits: {
+    name: "Permits & Applications",
+    category: "📋 Compliance & Licensing",
+    description: "Building and development permits",
+    fields: ["id", "permitNumber", "permitType", "applicantName", "propertyAddress", "applicationDate", "issueDate", "expirationDate", "status", "feeAmount", "inspector", "description"],
+  },
+  licenses: {
+    name: "Business Licenses",
+    category: "📋 Compliance & Licensing",
+    description: "Business licensing and registration",
+    fields: ["id", "licenseNumber", "licenseType", "businessName", "ownerName", "businessAddress", "applicationDate", "issueDate", "renewalDate", "status", "annualFee", "phone"],
+  },
+  municipalAssets: {
+    name: "Municipal Assets",
+    category: "🏗️ Assets & Inventory",
+    description: "Government-owned property and equipment",
+    fields: ["id", "assetTag", "assetType", "description", "department", "purchaseDate", "purchaseValue", "currentValue", "condition", "location", "serialNumber"],
+  },
+  inventory: {
+    name: "Inventory Management",
+    category: "🏗️ Assets & Inventory",
+    description: "Supplies and consumable inventory",
+    fields: ["id", "itemCode", "itemName", "category", "description", "quantity", "unitPrice", "totalValue", "location", "reorderLevel", "supplier", "lastUpdated"],
   },
 };
+
+// Group data types by category
+const groupedDataTypes = Object.entries(dataTypeConfigs).reduce((acc, [key, config]) => {
+  const category = config.category;
+  if (!acc[category]) {
+    acc[category] = [];
+  }
+  acc[category].push({ key, ...config });
+  return acc;
+}, {} as Record<string, Array<{ key: string; name: string; description: string; fields: string[] }>>);
 
 export function ConfigPanel({
   onGenerate,
   onPreview,
   isGenerating,
 }: ConfigPanelProps) {
-  const [selectedType, setSelectedType] =
-    useState<string>("citizens");
+  const [selectedType, setSelectedType] = useState<string>("citizens");
   const [recordCount, setRecordCount] = useState<number>(10);
-  const [selectedFields, setSelectedFields] = useState<
-    string[]
-  >(dataTypeConfigs.citizens.fields);
+  const [selectedFields, setSelectedFields] = useState<string[]>(dataTypeConfigs.citizens.fields);
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
   const handleTypeChange = (type: string) => {
     setSelectedType(type);
-    setSelectedFields(
-      dataTypeConfigs[type as keyof typeof dataTypeConfigs]
-        .fields,
-    );
+    setSelectedFields(dataTypeConfigs[type as keyof typeof dataTypeConfigs].fields);
   };
 
-  const handleFieldToggle = (
-    field: string,
-    checked: boolean,
-  ) => {
+  const handleFieldToggle = (field: string, checked: boolean) => {
     if (checked) {
       setSelectedFields([...selectedFields, field]);
     } else {
-      setSelectedFields(
-        selectedFields.filter((f) => f !== field),
-      );
+      setSelectedFields(selectedFields.filter((f) => f !== field));
     }
   };
 
-  const currentConfig =
-    dataTypeConfigs[
-    selectedType as keyof typeof dataTypeConfigs
-    ];
+  const toggleCategory = (category: string) => {
+    const newExpanded = new Set(expandedCategories);
+    if (newExpanded.has(category)) {
+      newExpanded.delete(category);
+    } else {
+      newExpanded.add(category);
+    }
+    setExpandedCategories(newExpanded);
+  };
+
+  const currentConfig = dataTypeConfigs[selectedType as keyof typeof dataTypeConfigs];
 
   return (
     <Card className="w-full">
@@ -309,77 +167,63 @@ export function ConfigPanel({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Top Row - Data Type and Record Count */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Data Type Selection with Categories */}
+        <div className="space-y-3">
+          <Label>Data Type</Label>
           <div className="space-y-2">
-            <Label htmlFor="data-type">Data Type</Label>
-            <Select
-              value={selectedType}
-              onValueChange={handleTypeChange}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select data type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="citizens">Citizens</SelectItem>
-                <SelectItem value="employees">
-                  Government Employees
-                </SelectItem>
-                <SelectItem value="services">
-                  Public Services
-                </SelectItem>
-                <SelectItem value="contracts">
-                  Government Contracts
-                </SelectItem>
-                <SelectItem value="assets">
-                  Municipal Assets
-                </SelectItem>
-                <SelectItem value="budget">
-                  Budget Records
-                </SelectItem>
-                <SelectItem value="permits">
-                  Permits & Applications
-                </SelectItem>
-                <SelectItem value="licenses">
-                  Business Licenses
-                </SelectItem>
-                <SelectItem value="purchaseOrders">
-                  Purchase Orders
-                </SelectItem>
-                <SelectItem value="invoices">
-                  Invoices & Payments
-                </SelectItem>
-                <SelectItem value="inventory">
-                  Inventory Management
-                </SelectItem>
-                              <SelectItem value="workOrders">
-                Work Orders
-              </SelectItem>
-              <SelectItem value="balanceSheet">
-                Balance Sheet
-              </SelectItem>
-              <SelectItem value="incomeStatement">
-                Income Statement
-              </SelectItem>
-            </SelectContent>
-          </Select>
+            {Object.entries(groupedDataTypes).map(([category, types]) => (
+              <div key={category} className="border rounded-lg">
+                <button
+                  type="button"
+                  onClick={() => toggleCategory(category)}
+                  className="flex items-center justify-between w-full p-3 text-left font-medium hover:bg-muted/50 rounded-t-lg transition-colors"
+                >
+                  <span>{category}</span>
+                  {expandedCategories.has(category) ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </button>
+                
+                {expandedCategories.has(category) && (
+                  <div className="p-3 pt-0 border-t bg-muted/20">
+                    {types.map((type) => (
+                      <div
+                        key={type.key}
+                        className={`p-2 rounded cursor-pointer transition-colors ${
+                          selectedType === type.key
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-muted"
+                        }`}
+                        onClick={() => handleTypeChange(type.key)}
+                      >
+                        <div className="font-medium">{type.name}</div>
+                        <div className="text-sm opacity-80">{type.description}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="record-count">
-              Number of Records
-            </Label>
-            <Input
-              id="record-count"
-              type="number"
-              min="1"
-              max="1000"
-              value={recordCount}
-              onChange={(e) =>
-                setRecordCount(parseInt(e.target.value) || 1)
-              }
-            />
-          </div>
+        {/* Record Count */}
+        <div className="space-y-2">
+          <Label htmlFor="record-count">
+            Number of Records
+          </Label>
+          <Input
+            id="record-count"
+            type="number"
+            min="1"
+            max="1000"
+            value={recordCount}
+            onChange={(e) =>
+              setRecordCount(parseInt(e.target.value) || 1)
+            }
+          />
         </div>
 
         {/* Fields Section */}

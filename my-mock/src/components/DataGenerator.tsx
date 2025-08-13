@@ -166,7 +166,7 @@ export const generateMockData = (type: string, count: number, fields: string[]) 
         if (fields.includes('description')) record.description = `${record.contractType} services contract with ${record.vendor}`;
         break;
         
-      case 'assets':
+      case 'municipalAssets':
         if (fields.includes('id')) record.id = i + 1;
         if (fields.includes('assetTag')) record.assetTag = generateAssetTag();
         if (fields.includes('assetType')) record.assetType = assetTypes[Math.floor(Math.random() * assetTypes.length)];
