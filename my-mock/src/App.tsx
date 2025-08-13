@@ -4,12 +4,13 @@ import { DataPreview } from './components/DataPreview';
 import { generateMockData } from './components/DataGenerator';
 import { toast } from 'sonner';
 import { Toaster } from './components/ui/sonner';
-import { Building2, Sparkles } from 'lucide-react';
+import { Building2, Sparkles, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
 export default function App() {
   const [generatedData, setGeneratedData] = useState<any[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentDataType, setCurrentDataType] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleGenerate = async (type: string, count: number, fields: string[]) => {
     setIsGenerating(true);
@@ -29,24 +30,7 @@ export default function App() {
     }
   };
 
-  const handlePreview = async (type: string, count: number, fields: string[]) => {
-    const previewCount = Math.min(count, 5);
-    setIsGenerating(true);
 
-    // Simulate AI processing delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    try {
-      const data = generateMockData(type, previewCount, fields);
-      setGeneratedData(data);
-      setCurrentDataType(type);
-      toast.success(`Preview generated for ${type}!`);
-    } catch {
-      toast.error('Failed to generate preview. Please try again.');
-    } finally {
-      setIsGenerating(false);
-    }
-  };
 
   const handleDownload = (format: 'json' | 'csv') => {
     toast.success(`Downloaded ${generatedData.length} records as ${format.toUpperCase()}!`);
@@ -66,24 +50,41 @@ export default function App() {
             <h1 className="text-3xl">Government Data Generator</h1>
           </div>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Generate comprehensive mock data for government applications, civic tech projects, and municipal ERP systems.
-            Create test datasets for citizens, employees, permits, licenses, procurement, inventory, and financial operations.
+            Generate comprehensive mock data for government applications
           </p>
         </div>
 
-        {/* Main Content - Stacked Layout */}
-        <div className="space-y-8 max-w-7xl mx-auto">
-          {/* Configuration Panel - Full Width */}
-          <div className="w-full">
-            <ConfigPanel
+        {/* Main Content - Sidebar Layout */}
+        <div className="flex gap-6 max-w-full mx-auto">
+          {/* Sidebar Toggle Button */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="fixed top-24 left-4 z-50 p-2 bg-background border rounded-lg shadow-lg hover:bg-muted transition-colors"
+            aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+          >
+            {sidebarOpen ? (
+              <PanelLeftClose className="h-4 w-4" />
+            ) : (
+              <PanelLeftOpen className="h-4 w-4" />
+            )}
+          </button>
+
+          {/* Configuration Panel - Collapsible Sidebar */}
+          <div className={`transition-all duration-300 ease-in-out ${
+            sidebarOpen 
+              ? 'w-80 flex-shrink-0' 
+              : 'w-0 overflow-hidden'
+          }`}>
+            <div className="sticky top-24">
+                          <ConfigPanel
               onGenerate={handleGenerate}
-              onPreview={handlePreview}
               isGenerating={isGenerating}
             />
+            </div>
           </div>
 
-          {/* Data Preview/Editor - Full Width */}
-          <div className="w-full">
+          {/* Data Preview/Editor - Main Content Area */}
+          <div className="flex-1 min-w-0">
             {isGenerating ? (
               <div className="flex items-center justify-center h-64 bg-card rounded-lg border">
                 <div className="text-center space-y-4">
@@ -111,7 +112,7 @@ export default function App() {
                   <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-lg text-muted-foreground">No Data Generated Yet</h3>
                   <p className="text-sm text-muted-foreground">
-                    Configure your government data type and click "Preview" or "Generate" to get started
+                    Configure your government data type and click "Generate Data" to get started
                   </p>
                 </div>
               </div>

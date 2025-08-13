@@ -9,15 +9,10 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
-import { Building2, Download, Eye, ChevronDown, ChevronRight } from "lucide-react";
+import { Building2, Download, ChevronDown, ChevronRight } from "lucide-react";
 
 interface ConfigPanelProps {
   onGenerate: (
-    _type: string,
-    _count: number,
-    _fields: string[],
-  ) => void;
-  onPreview: (
     _type: string,
     _count: number,
     _fields: string[],
@@ -125,7 +120,6 @@ const groupedDataTypes = Object.entries(dataTypeConfigs).reduce((acc, [key, conf
 
 export function ConfigPanel({
   onGenerate,
-  onPreview,
   isGenerating,
 }: ConfigPanelProps) {
   const [selectedType, setSelectedType] = useState<string>("citizens");
@@ -159,14 +153,14 @@ export function ConfigPanel({
   const currentConfig = dataTypeConfigs[selectedType as keyof typeof dataTypeConfigs];
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className="w-full h-fit">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-2 text-lg">
           <Building2 className="h-5 w-5 text-primary" />
-          Government Data Generator
+          Data Generator
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4">
         {/* Data Type Selection with Categories */}
         <div className="space-y-3">
           <Label>Data Type</Label>
@@ -209,6 +203,27 @@ export function ConfigPanel({
           </div>
         </div>
 
+        {/* Generate Button - Positioned Above Sections */}
+        <div className="pt-2">
+          <Button
+            onClick={() =>
+              onGenerate(
+                selectedType,
+                recordCount,
+                selectedFields,
+              )
+            }
+            disabled={
+              isGenerating || selectedFields.length === 0
+            }
+            className="w-full"
+            size="lg"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            {isGenerating ? "Generating..." : "Generate Data"}
+          </Button>
+        </div>
+
         {/* Record Count */}
         <div className="space-y-2">
           <Label htmlFor="record-count">
@@ -223,13 +238,14 @@ export function ConfigPanel({
             onChange={(e) =>
               setRecordCount(parseInt(e.target.value) || 1)
             }
+            className="border-2 border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </div>
 
         {/* Fields Section */}
         <div className="space-y-3">
           <Label>Fields to Include</Label>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-48 overflow-y-auto p-3 border rounded-lg bg-muted/20">
+          <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto p-3 border rounded-lg bg-muted/20">
             {currentConfig.fields.map((field) => (
               <div
                 key={field}
@@ -251,43 +267,6 @@ export function ConfigPanel({
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-3">
-          <Button
-            onClick={() =>
-              onPreview(
-                selectedType,
-                recordCount,
-                selectedFields,
-              )
-            }
-            variant="outline"
-            disabled={
-              isGenerating || selectedFields.length === 0
-            }
-            className="flex-1"
-          >
-            <Eye className="h-4 w-4 mr-2" />
-            Preview
-          </Button>
-          <Button
-            onClick={() =>
-              onGenerate(
-                selectedType,
-                recordCount,
-                selectedFields,
-              )
-            }
-            disabled={
-              isGenerating || selectedFields.length === 0
-            }
-            className="flex-1"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            {isGenerating ? "Generating..." : "Generate"}
-          </Button>
         </div>
       </CardContent>
     </Card>
