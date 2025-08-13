@@ -11,7 +11,6 @@ export default function App() {
   const [generatedData, setGeneratedData] = useState<any[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentDataType, setCurrentDataType] = useState('');
-  const [isEditMode, setIsEditMode] = useState(false);
 
   const handleGenerate = async (type: string, count: number, fields: string[]) => {
     setIsGenerating(true);
@@ -54,18 +53,7 @@ export default function App() {
     toast.success(`Downloaded ${generatedData.length} records as ${format.toUpperCase()}!`);
   };
 
-  const handleEditMode = () => {
-    setIsEditMode(true);
-  };
 
-  const handleSaveEdits = (editedData: any[]) => {
-    setGeneratedData(editedData);
-    setIsEditMode(false);
-  };
-
-  const handleBackToPreview = () => {
-    setIsEditMode(false);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
@@ -84,10 +72,10 @@ export default function App() {
           </p>
         </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {/* Configuration Panel */}
-          <div className="lg:col-span-1">
+        {/* Main Content - Stacked Layout */}
+        <div className="space-y-8 max-w-7xl mx-auto">
+          {/* Configuration Panel - Full Width */}
+          <div className="w-full">
             <ConfigPanel
               onGenerate={handleGenerate}
               onPreview={handlePreview}
@@ -95,8 +83,8 @@ export default function App() {
             />
           </div>
 
-          {/* Data Preview/Editor */}
-          <div className="lg:col-span-2">
+          {/* Data Preview/Editor - Full Width */}
+          <div className="w-full">
             {isGenerating ? (
               <div className="flex items-center justify-center h-64 bg-card rounded-lg border">
                 <div className="text-center space-y-4">
@@ -112,22 +100,12 @@ export default function App() {
                 </div>
               </div>
             ) : generatedData.length > 0 ? (
-              isEditMode ? (
-                <DataEditor
-                  data={generatedData}
-                  dataType={currentDataType}
-                  onSave={handleSaveEdits}
-                  onDownload={handleDownload}
-                  onBack={handleBackToPreview}
-                />
-              ) : (
-                <DataPreview
-                  data={generatedData}
-                  dataType={currentDataType}
-                  onDownload={handleDownload}
-                  onEdit={handleEditMode}
-                />
-              )
+              <DataPreview
+                data={generatedData}
+                dataType={currentDataType}
+                onDownload={handleDownload}
+                onDataChange={setGeneratedData}
+              />
             ) : (
               <div className="flex items-center justify-center h-64 bg-card rounded-lg border border-dashed">
                 <div className="text-center space-y-2">

@@ -266,7 +266,7 @@ export function ConfigPanel({
     ];
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Building2 className="h-5 w-5 text-primary" />
@@ -274,73 +274,77 @@ export function ConfigPanel({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="data-type">Data Type</Label>
-          <Select
-            value={selectedType}
-            onValueChange={handleTypeChange}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select data type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="citizens">Citizens</SelectItem>
-              <SelectItem value="employees">
-                Government Employees
-              </SelectItem>
-              <SelectItem value="services">
-                Public Services
-              </SelectItem>
-              <SelectItem value="contracts">
-                Government Contracts
-              </SelectItem>
-              <SelectItem value="assets">
-                Municipal Assets
-              </SelectItem>
-              <SelectItem value="budget">
-                Budget Records
-              </SelectItem>
-              <SelectItem value="permits">
-                Permits & Applications
-              </SelectItem>
-              <SelectItem value="licenses">
-                Business Licenses
-              </SelectItem>
-              <SelectItem value="purchaseOrders">
-                Purchase Orders
-              </SelectItem>
-              <SelectItem value="invoices">
-                Invoices & Payments
-              </SelectItem>
-              <SelectItem value="inventory">
-                Inventory Management
-              </SelectItem>
-              <SelectItem value="workOrders">
-                Work Orders
-              </SelectItem>
-            </SelectContent>
-          </Select>
+        {/* Top Row - Data Type and Record Count */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="data-type">Data Type</Label>
+            <Select
+              value={selectedType}
+              onValueChange={handleTypeChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select data type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="citizens">Citizens</SelectItem>
+                <SelectItem value="employees">
+                  Government Employees
+                </SelectItem>
+                <SelectItem value="services">
+                  Public Services
+                </SelectItem>
+                <SelectItem value="contracts">
+                  Government Contracts
+                </SelectItem>
+                <SelectItem value="assets">
+                  Municipal Assets
+                </SelectItem>
+                <SelectItem value="budget">
+                  Budget Records
+                </SelectItem>
+                <SelectItem value="permits">
+                  Permits & Applications
+                </SelectItem>
+                <SelectItem value="licenses">
+                  Business Licenses
+                </SelectItem>
+                <SelectItem value="purchaseOrders">
+                  Purchase Orders
+                </SelectItem>
+                <SelectItem value="invoices">
+                  Invoices & Payments
+                </SelectItem>
+                <SelectItem value="inventory">
+                  Inventory Management
+                </SelectItem>
+                <SelectItem value="workOrders">
+                  Work Orders
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="record-count">
+              Number of Records
+            </Label>
+            <Input
+              id="record-count"
+              type="number"
+              min="1"
+              max="1000"
+              value={recordCount}
+              onChange={(e) =>
+                setRecordCount(parseInt(e.target.value) || 1)
+              }
+            />
+          </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="record-count">
-            Number of Records
-          </Label>
-          <Input
-            id="record-count"
-            type="number"
-            min="1"
-            max="1000"
-            value={recordCount}
-            onChange={(e) =>
-              setRecordCount(parseInt(e.target.value) || 1)
-            }
-          />
-        </div>
-
+        {/* Fields Section */}
         <div className="space-y-3">
           <Label>Fields to Include</Label>
-          <div className="space-y-2 max-h-40 overflow-y-auto">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-48 overflow-y-auto p-3 border rounded-lg bg-muted/20">
             {currentConfig.fields.map((field) => (
               <div
                 key={field}
@@ -364,7 +368,8 @@ export function ConfigPanel({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
+        {/* Action Buttons */}
+        <div className="flex gap-3">
           <Button
             onClick={() =>
               onPreview(
@@ -377,6 +382,7 @@ export function ConfigPanel({
             disabled={
               isGenerating || selectedFields.length === 0
             }
+            className="flex-1"
           >
             <Eye className="h-4 w-4 mr-2" />
             Preview
@@ -392,6 +398,7 @@ export function ConfigPanel({
             disabled={
               isGenerating || selectedFields.length === 0
             }
+            className="flex-1"
           >
             <Download className="h-4 w-4 mr-2" />
             {isGenerating ? "Generating..." : "Generate"}
