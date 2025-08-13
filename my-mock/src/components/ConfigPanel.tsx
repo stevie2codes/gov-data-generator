@@ -9,7 +9,14 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
-import { Building2, Download, ChevronDown, ChevronRight } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { Building2, Download } from "lucide-react";
 
 interface ConfigPanelProps {
   onGenerate: (
@@ -125,7 +132,6 @@ export function ConfigPanel({
   const [selectedType, setSelectedType] = useState<string>("citizens");
   const [recordCount, setRecordCount] = useState<number>(10);
   const [selectedFields, setSelectedFields] = useState<string[]>(dataTypeConfigs.citizens.fields);
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
   const handleTypeChange = (type: string) => {
     setSelectedType(type);
@@ -140,16 +146,6 @@ export function ConfigPanel({
     }
   };
 
-  const toggleCategory = (category: string) => {
-    const newExpanded = new Set(expandedCategories);
-    if (newExpanded.has(category)) {
-      newExpanded.delete(category);
-    } else {
-      newExpanded.add(category);
-    }
-    setExpandedCategories(newExpanded);
-  };
-
   const currentConfig = dataTypeConfigs[selectedType as keyof typeof dataTypeConfigs];
 
   return (
@@ -161,46 +157,31 @@ export function ConfigPanel({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Data Type Selection with Categories */}
+        {/* Data Type Selection with Single Dropdown */}
         <div className="space-y-3">
           <Label>Data Type</Label>
-          <div className="space-y-2">
-            {Object.entries(groupedDataTypes).map(([category, types]) => (
-              <div key={category} className="border rounded-lg">
-                <button
-                  type="button"
-                  onClick={() => toggleCategory(category)}
-                  className="flex items-center justify-between w-full p-3 text-left font-medium hover:bg-muted/50 rounded-t-lg transition-colors"
-                >
-                  <span>{category}</span>
-                  {expandedCategories.has(category) ? (
-                    <ChevronDown className="h-4 w-4" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4" />
-                  )}
-                </button>
-                
-                {expandedCategories.has(category) && (
-                  <div className="p-3 pt-0 border-t bg-muted/20">
-                    {types.map((type) => (
-                      <div
-                        key={type.key}
-                        className={`p-2 rounded cursor-pointer transition-colors ${
-                          selectedType === type.key
-                            ? "bg-primary text-primary-foreground"
-                            : "hover:bg-muted"
-                        }`}
-                        onClick={() => handleTypeChange(type.key)}
-                      >
-                        <div className="font-medium">{type.name}</div>
-                        <div className="text-sm opacity-80">{type.description}</div>
-                      </div>
-                    ))}
+          <Select value={selectedType} onValueChange={handleTypeChange}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a data type" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(groupedDataTypes).map(([category, types]) => (
+                <div key={category}>
+                  <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground bg-muted/50 border-b">
+                    {category}
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
+                  {types.map((type) => (
+                    <SelectItem key={type.key} value={type.key}>
+                      <div className="flex flex-col items-start">
+                        <span className="font-medium">{type.name}</span>
+                        <span className="text-xs text-muted-foreground">{type.description}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </div>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Generate Button - Positioned Above Sections */}
