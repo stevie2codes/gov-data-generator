@@ -172,9 +172,9 @@ export function ConfigPanel({
                   </div>
                   {types.map((type) => (
                     <SelectItem key={type.key} value={type.key}>
-                      <div className="flex flex-col items-start">
-                        <span className="font-medium">{type.name}</span>
-                        <span className="text-xs text-muted-foreground">{type.description}</span>
+                      <div className="flex flex-col items-start min-w-0 w-full">
+                        <span className="font-medium truncate w-full">{type.name}</span>
+                        <span className="text-xs text-muted-foreground truncate w-full">{type.description}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -182,27 +182,6 @@ export function ConfigPanel({
               ))}
             </SelectContent>
           </Select>
-        </div>
-
-        {/* Generate Button - Positioned Above Sections */}
-        <div className="pt-2">
-          <Button
-            onClick={() =>
-              onGenerate(
-                selectedType,
-                recordCount,
-                selectedFields,
-              )
-            }
-            disabled={
-              isGenerating || selectedFields.length === 0
-            }
-            className="w-full"
-            size="lg"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            {isGenerating ? "Generating..." : "Generate Data"}
-          </Button>
         </div>
 
         {/* Record Count */}
@@ -221,6 +200,27 @@ export function ConfigPanel({
             }
             className="border-2 border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
+        </div>
+
+        {/* Generate Button - Positioned Below Record Count */}
+        <div className="pt-2">
+          <Button
+            onClick={() =>
+              onGenerate(
+                selectedType,
+                recordCount,
+                selectedFields,
+              )
+            }
+            disabled={
+              isGenerating || selectedFields.length === 0
+            }
+            className="w-full"
+            size="lg"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            {isGenerating ? "Generating..." : "Generate Data"}
+          </Button>
         </div>
 
         {/* Fields Section */}
