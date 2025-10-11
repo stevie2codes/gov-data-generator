@@ -15,10 +15,6 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  BarChart3,
-  ChevronRight as ChevronRightIcon,
-  TrendingUp,
-  TrendingDown,
   Settings,
   CheckCircle,
   Type,
@@ -26,7 +22,9 @@ import {
   Calendar,
   Mail,
   Phone,
-  X
+  X,
+  Columns3,
+  Download
 } from 'lucide-react';
 import { convertToCSV } from './DataGenerator';
 import { toast } from 'sonner';
@@ -90,8 +88,8 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
     transform: '',
     targetType: ''
   });
-  const [expandedStats, setExpandedStats] = useState<Set<string>>(new Set());
-  const [showAllStats, setShowAllStats] = useState(false);
+  const [columnDropdownOpen, setColumnDropdownOpen] = useState(false);
+  const [downloadDropdownOpen, setDownloadDropdownOpen] = useState(false);
 
   if (data.length === 0) return null;
 
@@ -160,17 +158,6 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
     setHiddenColumns(newHidden);
   };
 
-  // Toggle stat expansion
-  const toggleStat = (column: string) => {
-    const newExpanded = new Set(expandedStats);
-    if (newExpanded.has(column)) {
-      newExpanded.delete(column);
-    } else {
-      newExpanded.add(column);
-    }
-    setExpandedStats(newExpanded);
-  };
-
   // Format cell value
   const formatCellValue = (value: any) => {
     if (value === null || value === undefined) return '-';
@@ -208,57 +195,6 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
 
     onDownload(_format);
   };
-
-  // Data statistics with progressive disclosure
-  const stats = useMemo(() => {
-    const numericColumns = headers.filter(header => 
-      data.some(row => typeof row[header] === 'number')
-    );
-    
-    return numericColumns.map(column => {
-      const values = data.map(row => row[column]).filter(v => typeof v === 'number');
-      if (values.length === 0) return null;
-      
-      const sum = values.reduce((a, b) => a + b, 0);
-      const avg = sum / values.length;
-      const min = Math.min(...values);
-      const max = Math.max(...values);
-      
-      // Calculate percentiles for more detailed stats
-      const sortedValues = [...values].sort((a, b) => a - b);
-      const median = sortedValues[Math.floor(sortedValues.length / 2)];
-      const q1 = sortedValues[Math.floor(sortedValues.length * 0.25)];
-      const q3 = sortedValues[Math.floor(sortedValues.length * 0.75)];
-      
-      // Calculate variance and standard deviation
-      const variance = values.reduce((acc, val) => acc + Math.pow(val - avg, 2), 0) / values.length;
-      const stdDev = Math.sqrt(variance);
-      
-      // Find most common values (mode)
-      const frequency: { [key: number]: number } = {};
-      values.forEach(val => {
-        frequency[val] = (frequency[val] || 0) + 1;
-      });
-      const mode = Object.entries(frequency).reduce((a, b) => a[1] > b[1] ? a : b)[0];
-      
-      return { 
-        column, 
-        sum, 
-        avg, 
-        min, 
-        max, 
-        count: values.length,
-        median,
-        q1,
-        q3,
-        variance,
-        stdDev,
-        mode: Number(mode),
-        range: max - min,
-        coefficientOfVariation: (stdDev / avg) * 100
-      };
-    }).filter(Boolean);
-  }, [data, headers]);
 
   // Analyze column metadata for better editing
   const columnMetadata = useMemo(() => {
@@ -404,10 +340,6 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
 
   const visibleHeaders = headers.filter(header => !hiddenColumns.has(header));
 
-  // Show only first 3 stats by default, rest are hidden
-  const visibleStats = showAllStats ? stats : stats.slice(0, 3);
-  const hasHiddenStats = stats.length > 3;
-
   return (
     <Card className="w-full">
       <CardHeader>
@@ -419,15 +351,48 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
               <Badge variant="outline">{filteredData.length} filtered</Badge>
             )}
           </div>
-          <div className="flex gap-2">
-            <Button onClick={() => handleDownload('json')} variant="outline" size="sm">
-              <FileJson className="h-4 w-4 mr-2" />
-              JSON
+          {/* Download Button with Dropdown */}
+          <div className="relative">
+            <Button 
+              onClick={() => setDownloadDropdownOpen(!downloadDropdownOpen)} 
+              variant="outline" 
+              size="sm"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Download
+              <ChevronDown className="h-3 w-3 ml-1" />
             </Button>
-            <Button onClick={() => handleDownload('csv')} variant="outline" size="sm">
-              <FileSpreadsheet className="h-4 w-4 mr-2" />
-              CSV
-            </Button>
+            
+            {downloadDropdownOpen && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-popover border rounded-lg shadow-lg z-50">
+                <div className="p-2">
+                  <Button
+                    onClick={() => {
+                      handleDownload('json');
+                      setDownloadDropdownOpen(false);
+                    }}
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start"
+                  >
+                    <FileJson className="h-4 w-4 mr-2" />
+                    Export as JSON
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      handleDownload('csv');
+                      setDownloadDropdownOpen(false);
+                    }}
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start"
+                  >
+                    <FileSpreadsheet className="h-4 w-4 mr-2" />
+                    Export as CSV
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -455,133 +420,65 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
             </SelectContent>
           </Select>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setHiddenColumns(new Set())}
-          >
-            <Eye className="h-4 w-4 mr-2" />
-            Show All
-          </Button>
+          {/* Column Visibility Dropdown */}
+          <div className="relative">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setColumnDropdownOpen(!columnDropdownOpen)}
+            >
+              <Columns3 className="h-4 w-4 mr-2" />
+              Columns ({visibleHeaders.length}/{headers.length})
+            </Button>
+            
+            {columnDropdownOpen && (
+              <div className="absolute right-0 top-full mt-2 w-64 bg-popover border rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                <div className="p-3 border-b flex items-center justify-between">
+                  <span className="text-sm font-medium">Toggle Columns</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setColumnDropdownOpen(false)}
+                    className="h-6 w-6 p-0"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+                <div className="p-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setHiddenColumns(new Set())}
+                    className="w-full justify-start mb-1"
+                  >
+                    <Eye className="h-3 w-3 mr-2" />
+                    Show All Columns
+                  </Button>
+                  <div className="border-t my-2" />
+                  {headers.map((header) => (
+                    <Button
+                      key={header}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleColumn(header)}
+                      className="w-full justify-start text-xs"
+                    >
+                      {hiddenColumns.has(header) ? (
+                        <EyeOff className="h-3 w-3 mr-2" />
+                      ) : (
+                        <Eye className="h-3 w-3 mr-2" />
+                      )}
+                      {header.replace(/([A-Z])/g, ' $1').trim()}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </CardHeader>
 
       <CardContent>
-        {/* Statistics with Progressive Disclosure */}
-        {stats.length > 0 && (
-          <div className="mb-6 p-4 bg-muted/30 rounded-lg">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <BarChart3 className="h-4 w-4" />
-                <h4 className="font-medium">Data Statistics</h4>
-                <Badge variant="outline">{stats.length} numeric columns</Badge>
-              </div>
-              {hasHiddenStats && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowAllStats(!showAllStats)}
-                >
-                  {showAllStats ? 'Show Less' : `Show ${stats.length - 3} More`}
-                </Button>
-              )}
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {visibleStats.map((stat) => (
-                <div key={stat!.column} className="border rounded-lg p-3 bg-background">
-                  {/* Basic Stats - Always Visible */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="font-medium text-sm">
-                      {stat!.column.replace(/([A-Z])/g, ' $1').trim()}
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleStat(stat!.column)}
-                      className="h-6 w-6 p-0"
-                    >
-                      {expandedStats.has(stat!.column) ? (
-                        <ChevronDown className="h-3 w-3" />
-                      ) : (
-                        <ChevronRightIcon className="h-3 w-3" />
-                      )}
-                    </Button>
-                  </div>
-                  
-                  {/* Summary Stats */}
-                  <div className="grid grid-cols-2 gap-2 text-xs mb-2">
-                    <div className="flex items-center gap-1">
-                      <TrendingUp className="h-3 w-3 text-green-600" />
-                      <span>Avg: {stat!.avg.toFixed(2)}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <TrendingDown className="h-3 w-3 text-red-600" />
-                      <span>Range: {stat!.range.toFixed(2)}</span>
-                    </div>
-                  </div>
-                  
-                  {/* Expandable Detailed Stats */}
-                  {expandedStats.has(stat!.column) && (
-                    <div className="border-t pt-2 mt-2 space-y-2">
-                      <div className="text-xs text-muted-foreground">
-                        <div className="grid grid-cols-2 gap-1">
-                          <span>Count: {stat!.count}</span>
-                          <span>Sum: {stat!.sum.toLocaleString()}</span>
-                          <span>Min: {stat!.min}</span>
-                          <span>Max: {stat!.max}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="text-xs text-muted-foreground">
-                        <div className="font-medium mb-1">Distribution:</div>
-                        <div className="grid grid-cols-2 gap-1">
-                          <span>Median: {stat!.median.toFixed(2)}</span>
-                          <span>Mode: {stat!.mode}</span>
-                          <span>Q1: {stat!.q1.toFixed(2)}</span>
-                          <span>Q3: {stat!.q3.toFixed(2)}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="text-xs text-muted-foreground">
-                        <div className="font-medium mb-1">Variability:</div>
-                        <div className="grid grid-cols-2 gap-1">
-                          <span>Std Dev: {stat!.stdDev.toFixed(2)}</span>
-                          <span>CV: {stat!.coefficientOfVariation.toFixed(1)}%</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-            
-
-          </div>
-        )}
-
-        {/* Column Visibility Toggle */}
-        <div className="mb-4 p-3 bg-muted/20 rounded-lg">
-          <div className="text-sm font-medium mb-2">Toggle Columns:</div>
-          <div className="flex flex-wrap gap-2">
-            {headers.map((header) => (
-              <Button
-                key={header}
-                variant={hiddenColumns.has(header) ? "outline" : "default"}
-                size="sm"
-                onClick={() => toggleColumn(header)}
-                className="text-xs"
-              >
-                {hiddenColumns.has(header) ? (
-                  <EyeOff className="h-3 w-3 mr-1" />
-                ) : (
-                  <Eye className="h-3 w-3 mr-1" />
-                )}
-                {header.replace(/([A-Z])/g, ' $1').trim()}
-              </Button>
-            ))}
-          </div>
-        </div>
 
         {/* Data Table */}
         <div className="overflow-x-auto border rounded-lg">
@@ -591,11 +488,11 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
                 {visibleHeaders.map((header) => (
                   <TableHead 
                     key={header} 
-                    className="cursor-pointer hover:bg-muted/50 transition-colors"
+                    className="group relative"
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <div 
-                        className="flex items-center gap-1 flex-1"
+                        className="flex items-center gap-1 flex-1 cursor-pointer hover:text-primary transition-colors"
                         onClick={() => handleSort(header)}
                       >
                         {header.replace(/([A-Z])/g, ' $1').trim()}
@@ -614,7 +511,8 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
                         }}
                         variant="ghost"
                         size="sm"
-                        className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="h-6 w-6 p-0 opacity-40 group-hover:opacity-100 hover:bg-primary/10 hover:text-primary transition-all"
+                        title="Edit column"
                       >
                         <Settings className="h-3 w-3" />
                       </Button>
