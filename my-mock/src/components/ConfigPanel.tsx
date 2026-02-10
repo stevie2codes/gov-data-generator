@@ -1,10 +1,4 @@
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -14,9 +8,8 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "./ui/select";
-import { Building2, Download } from "lucide-react";
+import { Zap } from "lucide-react";
 
 interface ConfigPanelProps {
   onGenerate: (
@@ -147,34 +140,53 @@ export function ConfigPanel({
   };
 
   const currentConfig = dataTypeConfigs[selectedType as keyof typeof dataTypeConfigs];
+  const allSelected = selectedFields.length === currentConfig.fields.length;
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedFields([]);
+    } else {
+      setSelectedFields(currentConfig.fields);
+    }
+  };
 
   return (
-    <Card className="w-full h-fit">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Building2 className="h-5 w-5 text-primary" />
-          Data Generator
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Data Type Selection with Single Dropdown */}
-        <div className="space-y-3">
-          <Label>Data Type</Label>
+    <div className="terminal-card rounded-sm overflow-hidden">
+      {/* Panel Header */}
+      <div className="px-4 py-3 border-b border-primary/15 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-xs tracking-[0.25em] text-muted-foreground uppercase">Configure</span>
+        </div>
+        <div className="flex gap-1">
+          <span className="w-2 h-2 rounded-full bg-primary/20 border border-primary/30"></span>
+          <span className="w-2 h-2 rounded-full bg-accent/20 border border-accent/30"></span>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-5">
+
+        {/* Data Type Selection */}
+        <div className="space-y-2">
+          <Label className="text-xs tracking-[0.2em] text-muted-foreground uppercase">
+            Schema Type
+          </Label>
           <Select value={selectedType} onValueChange={handleTypeChange}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a data type" />
+            <SelectTrigger className="w-full bg-muted/30 border-primary/20 hover:border-primary/40 transition-colors rounded-sm h-9">
+              <span className={`text-sm ${currentConfig ? "text-foreground/90 font-medium" : "text-muted-foreground/50"}`}>
+                {currentConfig?.name || "Select a data type"}
+              </span>
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-sm min-w-[260px]">
               {Object.entries(groupedDataTypes).map(([category, types]) => (
                 <div key={category}>
-                  <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground bg-muted/50 border-b">
+                  <div className="px-3 py-2 text-[10px] tracking-[0.2em] text-muted-foreground/60 bg-muted/50 border-b border-primary/10 uppercase font-semibold">
                     {category}
                   </div>
                   {types.map((type) => (
-                    <SelectItem key={type.key} value={type.key}>
-                      <div className="flex flex-col items-start min-w-0 w-full">
-                        <span className="font-medium truncate w-full">{type.name}</span>
-                        <span className="text-xs text-muted-foreground truncate w-full">{type.description}</span>
+                    <SelectItem key={type.key} value={type.key} className="py-2.5 cursor-pointer">
+                      <div className="flex flex-col items-start gap-0.5">
+                        <span className="text-sm font-medium leading-tight">{type.name}</span>
+                        <span className="text-xs text-muted-foreground/65 leading-snug">{type.description}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -182,13 +194,26 @@ export function ConfigPanel({
               ))}
             </SelectContent>
           </Select>
+
+          {/* Schema description */}
+          {currentConfig && (
+            <p className="text-xs text-muted-foreground/50 leading-relaxed px-0.5">
+              {currentConfig.description}
+            </p>
+          )}
         </div>
+
+        {/* Divider */}
+        <div className="h-px bg-primary/10" />
 
         {/* Record Count */}
         <div className="space-y-2">
-          <Label htmlFor="record-count">
-            Number of Records
-          </Label>
+          <div className="flex items-center justify-between">
+            <Label className="text-xs tracking-[0.2em] text-muted-foreground uppercase">
+              Records
+            </Label>
+            <span className="text-xs text-accent font-mono">{recordCount}</span>
+          </div>
           <Input
             id="record-count"
             type="number"
@@ -198,39 +223,72 @@ export function ConfigPanel({
             onChange={(e) =>
               setRecordCount(parseInt(e.target.value) || 1)
             }
-            className="border-2 border-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="bg-muted/30 border-primary/20 focus:border-primary/60 rounded-sm h-8 text-xs"
           />
+          <div className="flex gap-1.5">
+            {[10, 25, 50, 100].map(n => (
+              <button
+                key={n}
+                onClick={() => setRecordCount(n)}
+                className={`flex-1 text-xs py-0.5 rounded-sm border transition-colors ${
+                  recordCount === n
+                    ? 'border-primary/50 bg-primary/10 text-primary'
+                    : 'border-primary/15 text-muted-foreground/50 hover:border-primary/30 hover:text-muted-foreground'
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Generate Button - Positioned Below Record Count */}
-        <div className="pt-2">
-          <Button
-            onClick={() =>
-              onGenerate(
-                selectedType,
-                recordCount,
-                selectedFields,
-              )
-            }
-            disabled={
-              isGenerating || selectedFields.length === 0
-            }
-            className="w-full"
-            size="lg"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            {isGenerating ? "Generating..." : "Generate Data"}
-          </Button>
-        </div>
+        {/* Generate Button */}
+        <Button
+          onClick={() =>
+            onGenerate(selectedType, recordCount, selectedFields)
+          }
+          disabled={isGenerating || selectedFields.length === 0}
+          className="w-full btn-amber h-9 rounded-sm text-xs tracking-[0.2em] uppercase font-semibold"
+          style={{ background: 'var(--accent)', color: 'var(--accent-foreground)' }}
+        >
+          {isGenerating ? (
+            <span className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full border border-accent-foreground/40 border-t-accent-foreground/80 animate-spin inline-block"></span>
+              Generating...
+            </span>
+          ) : (
+            <span className="flex items-center gap-2">
+              <Zap className="h-3.5 w-3.5" />
+              Generate Dataset
+            </span>
+          )}
+        </Button>
+
+        {/* Divider */}
+        <div className="h-px bg-primary/10" />
 
         {/* Fields Section */}
-        <div className="space-y-3">
-          <Label>Fields to Include</Label>
-          <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto p-3 border rounded-lg bg-muted/20">
-            {currentConfig.fields.map((field) => (
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs tracking-[0.2em] text-muted-foreground uppercase">
+              Fields
+            </Label>
+            <button
+              onClick={toggleSelectAll}
+              className="text-xs text-primary/60 hover:text-primary transition-colors tracking-wide"
+            >
+              {allSelected ? 'Deselect all' : 'Select all'}
+            </button>
+          </div>
+
+          <div className="space-y-0 max-h-52 overflow-y-auto rounded-sm border border-primary/10 bg-muted/10">
+            {currentConfig.fields.map((field, idx) => (
               <div
                 key={field}
-                className="flex items-center space-x-2"
+                className={`flex items-center gap-2.5 px-3 py-1.5 hover:bg-primary/5 transition-colors cursor-pointer ${
+                  idx < currentConfig.fields.length - 1 ? 'border-b border-primary/[0.07]' : ''
+                }`}
+                onClick={() => handleFieldToggle(field, !selectedFields.includes(field))}
               >
                 <Checkbox
                   id={field}
@@ -238,18 +296,22 @@ export function ConfigPanel({
                   onCheckedChange={(checked) =>
                     handleFieldToggle(field, checked as boolean)
                   }
+                  className="h-3 w-3 rounded-sm border-primary/30"
                 />
-                <Label
-                  htmlFor={field}
-                  className="text-sm capitalize cursor-pointer"
-                >
+                <span className={`text-xs capitalize select-none ${
+                  selectedFields.includes(field) ? 'text-foreground/80' : 'text-muted-foreground/50'
+                }`}>
                   {field.replace(/([A-Z])/g, " $1").trim()}
-                </Label>
+                </span>
               </div>
             ))}
           </div>
+
+          <div className="text-xs text-muted-foreground/40 text-right">
+            {selectedFields.length} / {currentConfig.fields.length} selected
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

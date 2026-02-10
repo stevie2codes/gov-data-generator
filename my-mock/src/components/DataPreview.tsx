@@ -341,31 +341,38 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
   const visibleHeaders = headers.filter(header => !hiddenColumns.has(header));
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <CardTitle>Data Preview</CardTitle>
-            <Badge variant="secondary">{data.length} records</Badge>
+    <Card className="w-full terminal-card rounded-sm border-primary/15">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2.5">
+            <CardTitle className="text-xs tracking-[0.25em] text-muted-foreground uppercase font-medium">
+              Dataset Output
+            </CardTitle>
+            <Badge variant="secondary" className="text-xs h-4 px-1.5 rounded-sm bg-primary/15 text-primary border-primary/25 font-mono">
+              {data.length} rec
+            </Badge>
             {filteredData.length !== data.length && (
-              <Badge variant="outline">{filteredData.length} filtered</Badge>
+              <Badge variant="outline" className="text-xs h-4 px-1.5 rounded-sm border-accent/30 text-accent font-mono">
+                {filteredData.length} filtered
+              </Badge>
             )}
           </div>
           {/* Download Button with Dropdown */}
           <div className="relative">
-            <Button 
-              onClick={() => setDownloadDropdownOpen(!downloadDropdownOpen)} 
-              variant="outline" 
+            <Button
+              onClick={() => setDownloadDropdownOpen(!downloadDropdownOpen)}
+              variant="outline"
               size="sm"
+              className="h-7 text-xs rounded-sm border-primary/20 hover:border-primary/40 hover:bg-primary/5"
             >
-              <Download className="h-4 w-4 mr-2" />
-              Download
+              <Download className="h-3.5 w-3.5 mr-1.5" />
+              Export
               <ChevronDown className="h-3 w-3 ml-1" />
             </Button>
             
             {downloadDropdownOpen && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-popover border rounded-lg shadow-lg z-50">
-                <div className="p-2">
+              <div className="absolute right-0 top-full mt-1.5 w-44 bg-popover border border-primary/20 rounded-sm shadow-lg shadow-black/40 z-50">
+                <div className="p-1.5 space-y-0.5">
                   <Button
                     onClick={() => {
                       handleDownload('json');
@@ -373,9 +380,9 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
                     }}
                     variant="ghost"
                     size="sm"
-                    className="w-full justify-start"
+                    className="w-full justify-start h-7 text-xs rounded-sm hover:bg-primary/10"
                   >
-                    <FileJson className="h-4 w-4 mr-2" />
+                    <FileJson className="h-3.5 w-3.5 mr-2 text-primary/70" />
                     Export as JSON
                   </Button>
                   <Button
@@ -385,9 +392,9 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
                     }}
                     variant="ghost"
                     size="sm"
-                    className="w-full justify-start"
+                    className="w-full justify-start h-7 text-xs rounded-sm hover:bg-primary/10"
                   >
-                    <FileSpreadsheet className="h-4 w-4 mr-2" />
+                    <FileSpreadsheet className="h-3.5 w-3.5 mr-2 text-primary/70" />
                     Export as CSV
                   </Button>
                 </div>
@@ -397,26 +404,26 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
         </div>
 
         {/* Search and Controls */}
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-2.5">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50" />
             <Input
-              placeholder="Search in all fields..."
+              placeholder="Search all fields..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-8 h-7 text-xs rounded-sm bg-muted/20 border-primary/15 focus:border-primary/40"
             />
           </div>
-          
+
           <Select value={pageSize.toString()} onValueChange={(value) => setPageSize(Number(value))}>
-            <SelectTrigger className="w-32">
+            <SelectTrigger className="w-24 h-7 text-xs rounded-sm border-primary/15 bg-muted/20">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="5">5 rows</SelectItem>
-              <SelectItem value="10">10 rows</SelectItem>
-              <SelectItem value="25">25 rows</SelectItem>
-              <SelectItem value="50">50 rows</SelectItem>
+            <SelectContent className="rounded-sm">
+              <SelectItem value="5" className="text-xs">5 rows</SelectItem>
+              <SelectItem value="10" className="text-xs">10 rows</SelectItem>
+              <SelectItem value="25" className="text-xs">25 rows</SelectItem>
+              <SelectItem value="50" className="text-xs">50 rows</SelectItem>
             </SelectContent>
           </Select>
 
@@ -426,49 +433,52 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
               variant="outline"
               size="sm"
               onClick={() => setColumnDropdownOpen(!columnDropdownOpen)}
+              className="h-7 text-xs rounded-sm border-primary/15 hover:border-primary/35 hover:bg-primary/5"
             >
-              <Columns3 className="h-4 w-4 mr-2" />
-              Columns ({visibleHeaders.length}/{headers.length})
+              <Columns3 className="h-3.5 w-3.5 mr-1.5" />
+              Cols ({visibleHeaders.length}/{headers.length})
             </Button>
-            
+
             {columnDropdownOpen && (
-              <div className="absolute right-0 top-full mt-2 w-64 bg-popover border rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
-                <div className="p-3 border-b flex items-center justify-between">
-                  <span className="text-sm font-medium">Toggle Columns</span>
+              <div className="absolute right-0 top-full mt-1.5 w-56 bg-popover border border-primary/20 rounded-sm shadow-lg shadow-black/40 z-50 max-h-80 overflow-y-auto">
+                <div className="px-3 py-2 border-b border-primary/15 flex items-center justify-between">
+                  <span className="text-xs tracking-[0.15em] text-muted-foreground uppercase">Columns</span>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setColumnDropdownOpen(false)}
-                    className="h-6 w-6 p-0"
+                    className="h-5 w-5 p-0 hover:bg-primary/10"
                   >
                     <X className="h-3 w-3" />
                   </Button>
                 </div>
-                <div className="p-2">
+                <div className="p-1.5">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setHiddenColumns(new Set())}
-                    className="w-full justify-start mb-1"
+                    className="w-full justify-start h-6 text-xs rounded-sm hover:bg-primary/10 mb-1"
                   >
-                    <Eye className="h-3 w-3 mr-2" />
-                    Show All Columns
+                    <Eye className="h-3 w-3 mr-2 text-primary/70" />
+                    Show All
                   </Button>
-                  <div className="border-t my-2" />
+                  <div className="border-t border-primary/10 my-1" />
                   {headers.map((header) => (
                     <Button
                       key={header}
                       variant="ghost"
                       size="sm"
                       onClick={() => toggleColumn(header)}
-                      className="w-full justify-start text-xs"
+                      className="w-full justify-start h-6 text-xs rounded-sm hover:bg-primary/10"
                     >
                       {hiddenColumns.has(header) ? (
-                        <EyeOff className="h-3 w-3 mr-2" />
+                        <EyeOff className="h-3 w-3 mr-2 text-muted-foreground/40" />
                       ) : (
-                        <Eye className="h-3 w-3 mr-2" />
+                        <Eye className="h-3 w-3 mr-2 text-primary/60" />
                       )}
-                      {header.replace(/([A-Z])/g, ' $1').trim()}
+                      <span className={hiddenColumns.has(header) ? 'text-muted-foreground/40' : ''}>
+                        {header.replace(/([A-Z])/g, ' $1').trim()}
+                      </span>
                     </Button>
                   ))}
                 </div>
@@ -481,26 +491,26 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
       <CardContent>
 
         {/* Data Table */}
-        <div className="overflow-x-auto border rounded-lg">
+        <div className="overflow-x-auto border border-primary/12 rounded-sm">
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="border-b border-primary/15 bg-muted/20 hover:bg-muted/20">
                 {visibleHeaders.map((header) => (
-                  <TableHead 
-                    key={header} 
-                    className="group relative"
+                  <TableHead
+                    key={header}
+                    className="group relative py-2 text-xs tracking-[0.1em] text-muted-foreground/70 uppercase font-medium"
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <div 
+                    <div className="flex items-center justify-between gap-1.5">
+                      <div
                         className="flex items-center gap-1 flex-1 cursor-pointer hover:text-primary transition-colors"
                         onClick={() => handleSort(header)}
                       >
                         {header.replace(/([A-Z])/g, ' $1').trim()}
                         {sortColumn === header && (
                           sortDirection === 'asc' ? (
-                            <ChevronUp className="h-4 w-4" />
+                            <ChevronUp className="h-3 w-3 text-primary" />
                           ) : (
-                            <ChevronDown className="h-4 w-4" />
+                            <ChevronDown className="h-3 w-3 text-primary" />
                           )
                         )}
                       </div>
@@ -511,7 +521,7 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
                         }}
                         variant="ghost"
                         size="sm"
-                        className="h-6 w-6 p-0 opacity-40 group-hover:opacity-100 hover:bg-primary/10 hover:text-primary transition-all"
+                        className="h-5 w-5 p-0 opacity-0 group-hover:opacity-60 hover:opacity-100 hover:bg-primary/10 hover:text-primary transition-all rounded-sm"
                         title="Edit column"
                       >
                         <Settings className="h-3 w-3" />
@@ -523,10 +533,15 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
             </TableHeader>
             <TableBody>
               {paginatedData.map((row, index) => (
-                <TableRow key={index} className="hover:bg-muted/30">
+                <TableRow
+                  key={index}
+                  className={`border-b border-primary/[0.06] hover:bg-primary/[0.04] transition-colors ${
+                    index % 2 === 0 ? 'bg-transparent' : 'bg-muted/[0.08]'
+                  }`}
+                >
                   {visibleHeaders.map((header) => (
-                    <TableCell key={header} className="max-w-48">
-                      <div className="truncate" title={formatCellValue(row[header])}>
+                    <TableCell key={header} className="max-w-48 py-1.5 text-xs text-foreground/70">
+                      <div className="truncate font-mono" title={formatCellValue(row[header])}>
                         {formatCellValue(row[header])}
                       </div>
                     </TableCell>
@@ -539,21 +554,22 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-4">
-            <div className="text-sm text-muted-foreground">
-              Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, sortedData.length)} of {sortedData.length} results
+          <div className="flex items-center justify-between mt-3">
+            <div className="text-xs text-muted-foreground/50 font-mono">
+              {((currentPage - 1) * pageSize) + 1}–{Math.min(currentPage * pageSize, sortedData.length)} / {sortedData.length}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage(currentPage - 1)}
                 disabled={currentPage === 1}
+                className="h-6 w-6 p-0 rounded-sm border-primary/20 hover:border-primary/40 hover:bg-primary/5"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-3.5 w-3.5" />
               </Button>
-              
-              <div className="flex items-center gap-1">
+
+              <div className="flex items-center gap-0.5">
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                   let pageNum;
                   if (totalPages <= 5) {
@@ -565,28 +581,33 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
                   } else {
                     pageNum = currentPage - 2 + i;
                   }
-                  
+
                   return (
                     <Button
                       key={pageNum}
                       variant={currentPage === pageNum ? "default" : "outline"}
                       size="sm"
                       onClick={() => setCurrentPage(pageNum)}
-                      className="w-8 h-8 p-0"
+                      className={`w-6 h-6 p-0 text-xs rounded-sm font-mono ${
+                        currentPage === pageNum
+                          ? 'bg-primary/20 text-primary border-primary/40'
+                          : 'border-primary/15 hover:border-primary/35 hover:bg-primary/5'
+                      }`}
                     >
                       {pageNum}
                     </Button>
                   );
                 })}
               </div>
-              
+
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
+                className="h-6 w-6 p-0 rounded-sm border-primary/20 hover:border-primary/40 hover:bg-primary/5"
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-3.5 w-3.5" />
               </Button>
             </div>
           </div>
@@ -594,64 +615,65 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
 
         {/* No results message */}
         {filteredData.length === 0 && searchTerm && (
-          <div className="text-center py-8 text-muted-foreground">
-            No results found for "{searchTerm}". Try adjusting your search terms.
+          <div className="text-center py-8 text-xs text-muted-foreground/50 font-mono tracking-widest">
+            // NO RESULTS FOR "{searchTerm}"
           </div>
         )}
       </CardContent>
 
       {/* Column Edit Modal */}
       {columnModal.isOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-background rounded-lg p-6 w-full max-w-md mx-4">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-card border border-primary/25 rounded-sm p-5 w-full max-w-md mx-4 terminal-card shadow-2xl shadow-black/60">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">
-                Edit Column: {columnModal.column}
-              </h3>
+              <div>
+                <div className="text-xs tracking-[0.2em] text-muted-foreground uppercase mb-1">Edit Column</div>
+                <h3 className="text-sm font-medium text-foreground font-mono">
+                  {columnModal.column}
+                </h3>
+              </div>
               <Button
                 onClick={closeColumnModal}
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0"
+                className="h-7 w-7 p-0 rounded-sm hover:bg-primary/10"
               >
-                <X className="h-4 w-4" />
+                <X className="h-3.5 w-3.5" />
               </Button>
             </div>
 
             {/* Column Info */}
             {columnModal.column && (
-              <div className="mb-4 p-3 bg-muted/30 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
+              <div className="mb-4 p-2.5 bg-muted/20 rounded-sm border border-primary/10">
+                <div className="flex items-center gap-2 mb-1.5">
                   {getColumnIcon(columnMetadata.find(c => c.name === columnModal.column!)?.type || 'string')}
-                  <span className="font-medium">{columnModal.column}</span>
-                  <Badge variant="outline">
+                  <Badge variant="outline" className="text-xs h-4 px-1.5 rounded-sm border-primary/30 text-primary/80 font-mono">
                     {columnMetadata.find(c => c.name === columnModal.column!)?.type || 'string'}
                   </Badge>
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  <div>Records: {data.length}</div>
-                  <div>Unique values: {columnMetadata.find(c => c.name === columnModal.column!)?.uniqueCount}</div>
+                <div className="text-xs text-muted-foreground/60 font-mono space-y-0.5">
+                  <div>{data.length} records · {columnMetadata.find(c => c.name === columnModal.column!)?.uniqueCount} unique values</div>
                 </div>
               </div>
             )}
 
             {/* Operation Selection */}
-            <div className="space-y-4">
+            <div className="space-y-3.5">
               <div>
-                <Label className="text-sm font-medium">Operation Type</Label>
+                <Label className="text-xs tracking-[0.15em] text-muted-foreground uppercase mb-1.5 block">Operation</Label>
                 <Select
                   value={columnModal.operation || ''}
-                  onValueChange={(value: 'replace' | 'transform' | 'convert') => 
+                  onValueChange={(value: 'replace' | 'transform' | 'convert') =>
                     setColumnModal(prev => ({ ...prev, operation: value }))
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8 text-xs rounded-sm border-primary/20 bg-muted/20">
                     <SelectValue placeholder="Select operation" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="replace">Replace All Values</SelectItem>
-                    <SelectItem value="transform">Transform Values</SelectItem>
-                    <SelectItem value="convert">Convert Data Type</SelectItem>
+                  <SelectContent className="rounded-sm">
+                    <SelectItem value="replace" className="text-xs">Replace All Values</SelectItem>
+                    <SelectItem value="transform" className="text-xs">Transform Values</SelectItem>
+                    <SelectItem value="convert" className="text-xs">Convert Data Type</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -659,11 +681,12 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
               {/* Replace Operation */}
               {columnModal.operation === 'replace' && (
                 <div>
-                  <Label className="text-sm font-medium">New Value</Label>
+                  <Label className="text-xs tracking-[0.15em] text-muted-foreground uppercase mb-1.5 block">New Value</Label>
                   <Input
                     placeholder="Enter new value for all records"
                     value={columnModal.value}
                     onChange={(e) => setColumnModal(prev => ({ ...prev, value: e.target.value }))}
+                    className="h-8 text-xs rounded-sm border-primary/20 bg-muted/20 focus:border-primary/50"
                   />
                 </div>
               )}
@@ -671,19 +694,19 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
               {/* Transform Operation */}
               {columnModal.operation === 'transform' && (
                 <div>
-                  <Label className="text-sm font-medium">Transformation</Label>
+                  <Label className="text-xs tracking-[0.15em] text-muted-foreground uppercase mb-1.5 block">Transformation</Label>
                   <Select
                     value={columnModal.transform}
                     onValueChange={(value) => setColumnModal(prev => ({ ...prev, transform: value }))}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-8 text-xs rounded-sm border-primary/20 bg-muted/20">
                       <SelectValue placeholder="Select transformation" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="uppercase">To Uppercase</SelectItem>
-                      <SelectItem value="lowercase">To Lowercase</SelectItem>
-                      <SelectItem value="capitalize">Capitalize Words</SelectItem>
-                      <SelectItem value="trim">Trim Whitespace</SelectItem>
+                    <SelectContent className="rounded-sm">
+                      <SelectItem value="uppercase" className="text-xs">To Uppercase</SelectItem>
+                      <SelectItem value="lowercase" className="text-xs">To Lowercase</SelectItem>
+                      <SelectItem value="capitalize" className="text-xs">Capitalize Words</SelectItem>
+                      <SelectItem value="trim" className="text-xs">Trim Whitespace</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -692,43 +715,44 @@ export function DataPreview({ data, dataType, onDownload, onDataChange }: DataPr
               {/* Convert Operation */}
               {columnModal.operation === 'convert' && (
                 <div>
-                  <Label className="text-sm font-medium">Target Data Type</Label>
+                  <Label className="text-xs tracking-[0.15em] text-muted-foreground uppercase mb-1.5 block">Target Type</Label>
                   <Select
                     value={columnModal.targetType}
                     onValueChange={(value) => setColumnModal(prev => ({ ...prev, targetType: value }))}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-8 text-xs rounded-sm border-primary/20 bg-muted/20">
                       <SelectValue placeholder="Select target type" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="string">String</SelectItem>
-                      <SelectItem value="number">Number</SelectItem>
-                      <SelectItem value="boolean">Boolean</SelectItem>
-                      <SelectItem value="date">Date</SelectItem>
+                    <SelectContent className="rounded-sm">
+                      <SelectItem value="string" className="text-xs">String</SelectItem>
+                      <SelectItem value="number" className="text-xs">Number</SelectItem>
+                      <SelectItem value="boolean" className="text-xs">Boolean</SelectItem>
+                      <SelectItem value="date" className="text-xs">Date</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               )}
 
               {/* Action Buttons */}
-              <div className="flex gap-2 pt-4">
+              <div className="flex gap-2 pt-1">
                 <Button
                   onClick={closeColumnModal}
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 h-8 text-xs rounded-sm border-primary/20 hover:border-primary/40"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={applyColumnModalChanges}
-                  disabled={!columnModal.operation || 
+                  disabled={!columnModal.operation ||
                     (columnModal.operation === 'replace' && !columnModal.value) ||
                     (columnModal.operation === 'transform' && !columnModal.transform) ||
                     (columnModal.operation === 'convert' && !columnModal.targetType)
                   }
-                  className="flex-1"
+                  className="flex-1 h-8 text-xs rounded-sm btn-amber"
+                  style={{ background: 'var(--accent)', color: 'var(--accent-foreground)' }}
                 >
-                  Apply Changes
+                  Apply
                 </Button>
               </div>
             </div>
