@@ -199,7 +199,7 @@ const assetsByType: Record<string, string[]> = {
     'Skate Park', 'Outdoor Amphitheater',
   ],
   'Machinery': [
-    'Vactor 2100 Sewer Cleaner', 'Elgin Pelican Street Sweeper', 'Kubota L3902 Tractor',
+    'Vector 2100 Sewer Cleaner', 'Elgin Pelican Street Sweeper', 'Kubota L3902 Tractor',
     'Leaf Vacuum Truck', 'Line Striping Machine', 'Asphalt Roller Compactor',
     'Motor Grader 120M', 'Plow Truck w/ Salt Spreader',
   ],
