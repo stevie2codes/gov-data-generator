@@ -62,7 +62,7 @@ const dataTypeConfigs = {
     name: "Income Statement",
     category: "💰 Financial & Accounting",
     description: "Revenue, expenses, and budget variance analysis",
-    fields: ["id", "accountNumber", "accountName", "category", "budgetedAmount", "actualAmount", "variance", "variancePercent", "fiscalYear", "period", "fund", "department", "notes"],
+    fields: ["id", "accountType", "fund", "function", "department", "division", "program", "location", "doeFunc", "grade", "object", "characterCode", "account", "fullAccount", "accountDescription", "fiscalCalendarName", "fiscalYear", "fiscalMonth", "calendarMonth"],
   },
   budget: {
     name: "Budget Records",

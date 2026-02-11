@@ -426,7 +426,6 @@ const workOrderLocations = [
 
 // ─── Financial ─────────────────────────────────────────────────────────────────
 const assetCategories = ['Current Assets', 'Fixed Assets', 'Intangible Assets', 'Investments'];
-const revenueCategories = ['Tax Revenue', 'Service Charges', 'Fines & Penalties', 'Intergovernmental', 'Investment Income', 'Other Revenue'];
 
 const accountNames = {
   assets: ['Cash & Cash Equivalents', 'Accounts Receivable', 'Inventory', 'Prepaid Expenses', 'Investments', 'Property, Plant & Equipment', 'Accumulated Depreciation', 'Intangible Assets', 'Other Assets'],
@@ -435,6 +434,64 @@ const accountNames = {
   revenue: ['Property Taxes', 'Sales Taxes', 'Income Taxes', 'Utility Charges', 'Permit Fees', 'License Fees', 'Fines & Penalties', 'Investment Income'],
   expenses: ['Salaries & Wages', 'Employee Benefits', 'Contract Services', 'Supplies', 'Utilities', 'Insurance', 'Depreciation', 'Interest Expense'],
 };
+
+// ─── Income Statement (DOE / Education Finance) ────────────────────────────────
+const incomeStatementFunds = [
+  '01 General Fund', '12 Child Development', '13 Cafeteria Fund',
+  '14 Deferred Maintenance', '21 Building Fund', '25 Capital Facilities',
+  '40 Special Reserve', '63 Employee Benefit', '67 Self-Insurance',
+];
+
+const incomeStatementFunctions = [
+  '1000 Instruction', '2100 Pupil Support Services', '2200 Instructional Support',
+  '2300 General Administration', '2400 School Administration', '2500 Business Services',
+  '2600 Operations & Maintenance', '2700 Student Transportation', '3100 Food Services',
+  '3300 Community Services', '7100 Debt Service',
+];
+
+const incomeStatementDivisions = [
+  'Elementary Education', 'Secondary Education', 'Special Education',
+  'Career & Technical Education', 'Adult Education', 'Early Childhood',
+  'Curriculum & Instruction', 'Business & Finance', 'Human Resources',
+  'Facilities & Operations',
+];
+
+const incomeStatementPrograms = [
+  'Regular Education', 'Special Education – Mild/Moderate', 'Special Education – Moderate/Severe',
+  'ELL / English Language Development', 'Gifted & Talented', 'Career Technical Education',
+  'Athletics & Co-Curricular', 'After School Programs', 'Title I – Low Income',
+  'Title III – Language Instruction', 'Resource Specialist Program',
+];
+
+const incomeStatementLocations = [
+  '0000 District Office', '0100 Lincoln Elementary', '0200 Jefferson Elementary',
+  '0300 Washington Middle School', '0400 Roosevelt High School', '0500 District Warehouse',
+  '0600 Adult Education Center', '0700 Child Development Center', '0800 Continuation High School',
+];
+
+const doeFunctionCodes = [
+  '1000', '2100', '2200', '2300', '2400', '2500', '2600', '2700', '3100', '3300', '7100',
+];
+
+const incomeStatementGrades = [
+  'K', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
+  'Adult', 'Preschool', 'All Grades',
+];
+
+const incomeStatementObjects = [
+  '1000 Certificated Salaries', '2000 Classified Salaries', '3000 Employee Benefits',
+  '4000 Books & Supplies', '5000 Services & Operating', '6000 Capital Outlay',
+  '7000 Other Outgo', '8000 Revenues', '9000 Reserves',
+];
+
+const fiscalCalendarNames = [
+  '2022-23 Fiscal Year', '2023-24 Fiscal Year', '2024-25 Fiscal Year', '2025-26 Fiscal Year',
+];
+
+const calendarMonthNames = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
 
 // ─── Core helpers ──────────────────────────────────────────────────────────────
 const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
@@ -789,27 +846,46 @@ export const generateMockData = (type: string, count: number, fields: string[]) 
       }
 
       case 'incomeStatement': {
-        const isRevenue = Math.random() > 0.45;
-        const category  = isRevenue ? pick(revenueCategories) : pick(['Personnel Costs', 'Contractual Services', 'Supplies & Materials', 'Utilities', 'Capital Outlay', 'Debt Service']);
-        const acctName  = isRevenue ? pick(accountNames.revenue) : pick(accountNames.expenses);
-        // Actual amount is within ±18% of budget (realistic variance)
-        const budgeted  = generateFinancialAmount(80000, 3500000);
-        const variancePct = (Math.random() * 0.36) - 0.18; // ±18%
-        const actual    = parseFloat((budgeted * (1 + variancePct)).toFixed(2));
-        const variance  = parseFloat((actual - budgeted).toFixed(2));
-        if (fields.includes('id'))              record.id              = i + 1;
-        if (fields.includes('accountNumber'))   record.accountNumber   = generateAccountNumber(isRevenue ? 'revenue' : 'expenses');
-        if (fields.includes('accountName'))     record.accountName     = acctName;
-        if (fields.includes('category'))        record.category        = category;
-        if (fields.includes('budgetedAmount'))  record.budgetedAmount  = parseFloat(budgeted.toFixed(2));
-        if (fields.includes('actualAmount'))    record.actualAmount    = actual;
-        if (fields.includes('variance'))        record.variance        = variance;
-        if (fields.includes('variancePercent')) record.variancePercent = parseFloat((variancePct * 100).toFixed(2));
-        if (fields.includes('fiscalYear'))      record.fiscalYear      = generateFiscalYear();
-        if (fields.includes('period'))          record.period          = pick(['Q1', 'Q2', 'Q3', 'Q4', 'Annual']);
-        if (fields.includes('fund'))            record.fund            = pick(['General Fund', 'Special Revenue Fund', 'Capital Projects Fund', 'Debt Service Fund', 'Enterprise Fund']);
-        if (fields.includes('department'))      record.department      = pick(departments);
-        if (fields.includes('notes'))           record.notes           = `${isRevenue ? 'Revenue' : 'Expenditure'} – ${record.period} ${record.fiscalYear}`;
+        const fund        = pick(incomeStatementFunds);
+        const func        = pick(incomeStatementFunctions);
+        const division    = pick(incomeStatementDivisions);
+        const program     = pick(incomeStatementPrograms);
+        const location    = pick(incomeStatementLocations);
+        const doeFunc     = pick(doeFunctionCodes);
+        const grade       = pick(incomeStatementGrades);
+        const object      = pick(incomeStatementObjects);
+        const calIdx      = generateRandomNumber(0, 11);
+        const calendarMonth    = calendarMonthNames[calIdx];
+        // Fiscal year starts in July (month index 6): fiscal month 1 = July
+        const fiscalMonth      = ((calIdx - 6 + 12) % 12) + 1;
+        const fiscalCalendarName = pick(fiscalCalendarNames);
+        const fiscalYear       = fiscalCalendarName.split(' ')[0]; // e.g. "2024-25"
+        const accountType      = fiscalYear && Math.random() > 0.45 ? 'Revenue' : 'Expenditure';
+        const acctNum          = generateRandomNumber(1000, 9999).toString();
+        const fundCode         = fund.split(' ')[0];       // "01"
+        const objectCode       = object.split(' ')[0];     // "1000"
+        const locationCode     = location.split(' ')[0];   // "0100"
+        const fullAccount      = `${fundCode}-${doeFunc}-${objectCode}-${locationCode}`;
+        const accountDescription = `${accountType} – ${func} – ${program}`;
+        if (fields.includes('id'))                  record.id                  = i + 1;
+        if (fields.includes('accountType'))         record.accountType         = accountType;
+        if (fields.includes('fund'))                record.fund                = fund;
+        if (fields.includes('function'))            record['function']         = func;
+        if (fields.includes('department'))          record.department          = pick(departments);
+        if (fields.includes('division'))            record.division            = division;
+        if (fields.includes('program'))             record.program             = program;
+        if (fields.includes('location'))            record.location            = location;
+        if (fields.includes('doeFunc'))             record.doeFunc             = doeFunc;
+        if (fields.includes('grade'))               record.grade               = grade;
+        if (fields.includes('object'))              record['object']           = object;
+        if (fields.includes('characterCode'))       record.characterCode       = generateRandomNumber(1, 9).toString();
+        if (fields.includes('account'))             record.account             = acctNum;
+        if (fields.includes('fullAccount'))         record.fullAccount         = fullAccount;
+        if (fields.includes('accountDescription')) record.accountDescription   = accountDescription;
+        if (fields.includes('fiscalCalendarName')) record.fiscalCalendarName   = fiscalCalendarName;
+        if (fields.includes('fiscalYear'))          record.fiscalYear          = fiscalYear;
+        if (fields.includes('fiscalMonth'))         record.fiscalMonth         = fiscalMonth;
+        if (fields.includes('calendarMonth'))       record.calendarMonth       = calendarMonth;
         break;
       }
 
