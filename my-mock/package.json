@@ -11,10 +11,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 10",
-    "type-check": "tsc --noEmit",
-    "mcp": "node mcp-server-simple.js",
-    "api": "node api-server.js",
-    "ai": "node ai-assistant.js"
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
