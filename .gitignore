@@ -1,0 +1,23 @@
+node_modules
+dist
+.env
+.env.local
+.env.*.local
+.DS_Store
+*.log
+*.swp
+*.swo
+
+# IDE / editor
+.vscode
+.idea
+*.code-workspace
+
+# Tool configs
+.agents
+.claude
+.continue
+.cursor
+.mcp
+.playwright-mcp
+.vite
