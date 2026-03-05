@@ -55,7 +55,8 @@ router.get("/:type", (req: Request, res: Response) => {
     return;
   }
 
-  const count = Math.min(Math.max(parseInt(req.query.count as string) || 10, 1), 1000);
+  const parsed = parseInt(req.query.count as string);
+  const count = Math.min(Math.max(Number.isNaN(parsed) ? 10 : parsed, 1), 1000);
 
   let fields: string[];
   if (req.query.fields) {
