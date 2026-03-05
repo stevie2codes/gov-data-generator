@@ -4,7 +4,9 @@ import { DataPreview } from './components/DataPreview';
 import { generateMockData } from './components/DataGenerator';
 import { toast } from 'sonner';
 import { Toaster } from './components/ui/sonner';
-import { Building2, Sparkles, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Building2, Sparkles, PanelLeftClose, PanelLeftOpen, BookOpen } from 'lucide-react';
+import { ApiInfoPanel } from './components/ApiInfoPanel';
+import { Button } from './components/ui/button';
 
 export default function App() {
   const [generatedData, setGeneratedData] = useState<any[]>([]);
@@ -39,8 +41,8 @@ export default function App() {
       <div className="container mx-auto px-6 py-6">
 
         {/* Classification Banner */}
-        <div className="text-center py-1 mb-6 border-y border-primary/20">
-          <span className="text-xs tracking-[0.25em] text-primary/50 uppercase font-mono select-none">
+        <div className="text-center py-1.5 mb-6 border-y border-primary/20">
+          <span className="text-xs tracking-[0.25em] text-primary/60 uppercase font-data select-none">
             UNCLASSIFIED &nbsp;·&nbsp; SIMULATION ENVIRONMENT &nbsp;·&nbsp; NOT FOR OPERATIONAL USE
           </span>
         </div>
@@ -49,25 +51,31 @@ export default function App() {
         <div className="flex items-start justify-between mb-8 animate-fade-slide-in">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Building2 className="h-4 w-4 text-primary/70" />
-              <span className="text-xs tracking-[0.3em] text-muted-foreground uppercase">
+              <Building2 className="h-4 w-4 text-primary/80" />
+              <span className="text-xs tracking-[0.3em] text-muted-foreground/80 uppercase font-medium">
                 Federal Systems / Mock Data Terminal
               </span>
             </div>
-            <h1 className="text-foreground mb-2" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(2.4rem, 5vw, 3.8rem)', letterSpacing: '0.05em', lineHeight: 1 }}>
+            <h1 className="text-foreground mb-3" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(2.4rem, 5vw, 3.8rem)', letterSpacing: '0.05em', lineHeight: 1 }}>
               Government Data Generator
             </h1>
-            <p className="text-muted-foreground text-xs tracking-wide">
+            <p className="text-muted-foreground text-sm tracking-wide">
               Generate comprehensive mock records for testing government applications
             </p>
           </div>
 
-          <div className="flex flex-col items-end gap-1 mt-1 text-right">
+          <div className="flex flex-col items-end gap-1.5 mt-1 text-right">
             <div className="flex items-center gap-2">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-              <span className="text-xs text-green-500/80 tracking-widest">ONLINE</span>
+              <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+              <span className="text-xs text-green-400/90 tracking-widest font-medium">ONLINE</span>
             </div>
-            <span className="text-xs text-muted-foreground/50 tracking-widest">v2.4.1 · 14 SCHEMAS</span>
+            <span className="text-xs text-muted-foreground/70 tracking-widest font-data">v2.4.1 · 14 SCHEMAS</span>
+            <ApiInfoPanel>
+              <Button variant="outline" size="sm" className="h-7 px-2.5 gap-1.5 text-xs tracking-wider uppercase font-semibold border-primary/25 text-muted-foreground hover:text-foreground">
+                <BookOpen className="h-3 w-3" />
+                API
+              </Button>
+            </ApiInfoPanel>
           </div>
         </div>
 
@@ -118,10 +126,10 @@ export default function App() {
                   </div>
 
                   <div>
-                    <div className="text-xs tracking-[0.3em] text-primary animate-pulse mb-1">
+                    <div className="text-sm tracking-[0.3em] text-primary animate-pulse mb-1 font-semibold">
                       SYNTHESIZING DATASET
                     </div>
-                    <div className="text-xs text-muted-foreground/60">
+                    <div className="text-sm text-muted-foreground">
                       Generating realistic government records...
                     </div>
                   </div>
@@ -154,13 +162,13 @@ export default function App() {
                   <div className="relative mx-auto w-16 h-16 flex items-center justify-center corner-notch">
                     <div className="absolute inset-0 border border-primary/10"></div>
                     <div className="absolute inset-3 border border-primary/[0.07]"></div>
-                    <Building2 className="h-7 w-7 text-muted-foreground/40" />
+                    <Building2 className="h-7 w-7 text-muted-foreground/60" />
                   </div>
                   <div>
-                    <div className="text-xs tracking-[0.3em] text-muted-foreground/50 mb-1">
+                    <div className="text-sm tracking-[0.3em] text-muted-foreground/70 mb-1.5 font-data">
                       // AWAITING INPUT
                     </div>
-                    <div className="text-xs text-muted-foreground/35">
+                    <div className="text-sm text-muted-foreground/60">
                       Configure a dataset schema and click Generate
                     </div>
                   </div>

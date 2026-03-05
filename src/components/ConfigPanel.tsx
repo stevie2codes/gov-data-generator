@@ -77,11 +77,11 @@ export function ConfigPanel({
       {/* Panel Header */}
       <div className="px-4 py-3 border-b border-primary/15 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xs tracking-[0.25em] text-muted-foreground uppercase">Configure</span>
+          <span className="text-sm font-semibold tracking-[0.2em] text-muted-foreground uppercase">Configure</span>
         </div>
-        <div className="flex gap-1">
-          <span className="w-2 h-2 rounded-full bg-primary/20 border border-primary/30"></span>
-          <span className="w-2 h-2 rounded-full bg-accent/20 border border-accent/30"></span>
+        <div className="flex gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-primary/25 border border-primary/40"></span>
+          <span className="w-2 h-2 rounded-full bg-accent/25 border border-accent/40"></span>
         </div>
       </div>
 
@@ -89,26 +89,26 @@ export function ConfigPanel({
 
         {/* Data Type Selection */}
         <div className="space-y-2">
-          <Label className="text-xs tracking-[0.2em] text-muted-foreground uppercase">
+          <Label className="text-xs tracking-[0.2em] text-muted-foreground uppercase font-semibold">
             Schema Type
           </Label>
           <Select value={selectedType} onValueChange={handleTypeChange}>
-            <SelectTrigger className="w-full bg-muted/30 border-primary/20 hover:border-primary/40 transition-colors rounded-sm h-9">
-              <span className={`text-sm ${currentConfig ? "text-foreground/90 font-medium" : "text-muted-foreground/50"}`}>
+            <SelectTrigger className="w-full bg-secondary border-primary/20 hover:border-primary/40 transition-colors rounded-sm h-9">
+              <span className={`text-sm ${currentConfig ? "text-foreground font-medium" : "text-muted-foreground/70"}`}>
                 {currentConfig?.name || "Select a data type"}
               </span>
             </SelectTrigger>
             <SelectContent className="rounded-sm min-w-[260px]">
               {Object.entries(groupedDataTypes).map(([category, types]) => (
                 <div key={category}>
-                  <div className="px-3 py-2 text-[10px] tracking-[0.2em] text-muted-foreground/60 bg-muted/50 border-b border-primary/10 uppercase font-semibold">
+                  <div className="px-3 py-2 text-xs tracking-[0.15em] text-muted-foreground/80 bg-muted/50 border-b border-primary/10 uppercase font-semibold">
                     {category}
                   </div>
                   {types.map((type) => (
                     <SelectItem key={type.key} value={type.key} className="py-2.5 cursor-pointer">
                       <div className="flex flex-col items-start gap-0.5">
                         <span className="text-sm font-medium leading-tight">{type.name}</span>
-                        <span className="text-xs text-muted-foreground/65 leading-snug">{type.description}</span>
+                        <span className="text-xs text-muted-foreground leading-snug">{type.description}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -119,7 +119,7 @@ export function ConfigPanel({
 
           {/* Schema description */}
           {currentConfig && (
-            <p className="text-xs text-muted-foreground/50 leading-relaxed px-0.5">
+            <p className="text-xs text-muted-foreground/80 leading-relaxed px-0.5">
               {currentConfig.description}
             </p>
           )}
@@ -131,10 +131,10 @@ export function ConfigPanel({
         {/* Record Count */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label className="text-xs tracking-[0.2em] text-muted-foreground uppercase">
+            <Label className="text-xs tracking-[0.2em] text-muted-foreground uppercase font-semibold">
               Records
             </Label>
-            <span className="text-xs text-accent font-mono">{recordCount}</span>
+            <span className="text-sm text-accent font-data font-medium">{recordCount}</span>
           </div>
           <Input
             id="record-count"
@@ -145,17 +145,17 @@ export function ConfigPanel({
             onChange={(e) =>
               setRecordCount(parseInt(e.target.value) || 1)
             }
-            className="bg-muted/30 border-primary/20 focus:border-primary/60 rounded-sm h-8 text-xs"
+            className="bg-secondary border-primary/20 focus:border-primary/60 rounded-sm h-9 text-sm font-data text-foreground"
           />
           <div className="flex gap-1.5">
             {[10, 25, 50, 100].map(n => (
               <button
                 key={n}
                 onClick={() => setRecordCount(n)}
-                className={`flex-1 text-xs py-0.5 rounded-sm border transition-colors ${
+                className={`flex-1 text-xs py-1 rounded-sm border transition-colors font-semibold ${
                   recordCount === n
                     ? 'border-primary/50 bg-primary/10 text-primary'
-                    : 'border-primary/15 text-muted-foreground/50 hover:border-primary/30 hover:text-muted-foreground'
+                    : 'border-primary/20 text-muted-foreground/70 hover:border-primary/40 hover:text-muted-foreground'
                 }`}
               >
                 {n}
@@ -170,7 +170,7 @@ export function ConfigPanel({
             onGenerate(selectedType, recordCount, selectedFields)
           }
           disabled={isGenerating || selectedFields.length === 0}
-          className="w-full btn-amber h-9 rounded-sm text-xs tracking-[0.2em] uppercase font-semibold"
+          className="w-full btn-amber h-10 rounded-sm text-sm tracking-[0.15em] uppercase font-semibold"
           style={{ background: 'var(--accent)', color: 'var(--accent-foreground)' }}
         >
           {isGenerating ? (
@@ -192,12 +192,12 @@ export function ConfigPanel({
         {/* Fields Section */}
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
-            <Label className="text-xs tracking-[0.2em] text-muted-foreground uppercase">
+            <Label className="text-xs tracking-[0.2em] text-muted-foreground uppercase font-semibold">
               Fields
             </Label>
             <button
               onClick={toggleSelectAll}
-              className="text-xs text-primary/60 hover:text-primary transition-colors tracking-wide"
+              className="text-xs text-primary/80 hover:text-primary transition-colors tracking-wide font-medium"
             >
               {allSelected ? 'Deselect all' : 'Select all'}
             </button>
@@ -220,8 +220,8 @@ export function ConfigPanel({
                   }
                   className="h-3 w-3 rounded-sm border-primary/30"
                 />
-                <span className={`text-xs capitalize select-none ${
-                  selectedFields.includes(field) ? 'text-foreground/80' : 'text-muted-foreground/50'
+                <span className={`text-sm capitalize select-none ${
+                  selectedFields.includes(field) ? 'text-foreground/90' : 'text-muted-foreground/70'
                 }`}>
                   {field.replace(/([A-Z])/g, " $1").trim()}
                 </span>
@@ -229,7 +229,7 @@ export function ConfigPanel({
             ))}
           </div>
 
-          <div className="text-xs text-muted-foreground/40 text-right">
+          <div className="text-xs text-muted-foreground/70 text-right font-data">
             {selectedFields.length} / {currentConfig.fields.length} selected
           </div>
         </div>

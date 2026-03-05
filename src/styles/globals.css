@@ -7,32 +7,32 @@
 @tailwind utilities;
 
 :root {
-  --font-size: 13px;
+  --font-size: 15px;
 
   /* ─── Federal Data Terminal — Dark Theme ─────── */
   --background: #070c17;
-  --foreground: #c8d6e8;
+  --foreground: #dce4f0;
   --card: #0c1424;
-  --card-foreground: #c8d6e8;
+  --card-foreground: #dce4f0;
   --popover: #0d1628;
-  --popover-foreground: #c8d6e8;
-  --primary: #4d8ef0;
+  --popover-foreground: #dce4f0;
+  --primary: #5a9af5;
   --primary-foreground: #ffffff;
   --secondary: #192236;
-  --secondary-foreground: #7aabf7;
+  --secondary-foreground: #8ab8f7;
   --muted: #101d33;
-  --muted-foreground: #5a7498;
+  --muted-foreground: #7d9bbf;
   --accent: #f0a030;
   --accent-foreground: #060c18;
   --destructive: #e05252;
   --destructive-foreground: #ffffff;
-  --border: rgba(77, 142, 240, 0.14);
+  --border: rgba(77, 142, 240, 0.18);
   --input: #0c1424;
   --input-background: #0c1424;
   --switch-background: #192236;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: #4d8ef0;
+  --ring: #5a9af5;
   --radius: 0.25rem;
 
   /* chart */
@@ -62,12 +62,14 @@
 
   body {
     @apply bg-background text-foreground; /* stylelint-disable-line at-rule-no-unknown */
-    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+    font-family: 'Manrope', 'system-ui', sans-serif;
     /* Blueprint grid background */
     background-image:
       linear-gradient(rgba(77, 142, 240, 0.04) 1px, transparent 1px),
       linear-gradient(90deg, rgba(77, 142, 240, 0.04) 1px, transparent 1px);
     background-size: 32px 32px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -83,53 +85,63 @@
     }
 
     h2 {
+      font-family: 'Manrope', sans-serif;
       font-size: 1.25rem;
-      font-weight: var(--font-weight-medium);
-      letter-spacing: 0.04em;
+      font-weight: 600;
+      letter-spacing: 0.02em;
       line-height: 1.4;
     }
 
     h3 {
+      font-family: 'Manrope', sans-serif;
       font-size: 1.125rem;
-      font-weight: var(--font-weight-medium);
-      letter-spacing: 0.03em;
+      font-weight: 600;
+      letter-spacing: 0.01em;
       line-height: 1.4;
     }
 
     h4 {
+      font-family: 'Manrope', sans-serif;
       font-size: 1rem;
-      font-weight: var(--font-weight-medium);
+      font-weight: 600;
       line-height: 1.5;
     }
 
     p {
+      font-family: 'Manrope', sans-serif;
       font-size: 1rem;
       font-weight: var(--font-weight-normal);
-      line-height: 1.6;
+      line-height: 1.65;
     }
 
     label {
-      font-size: 1rem;
-      font-weight: var(--font-weight-medium);
+      font-family: 'Manrope', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 600;
       line-height: 1.5;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.04em;
     }
 
     button {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 1rem;
-      font-weight: var(--font-weight-medium);
-      letter-spacing: 0.04em;
+      font-family: 'Manrope', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
       line-height: 1.5;
     }
 
     input {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 1rem;
+      font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+      font-size: 0.875rem;
       font-weight: var(--font-weight-normal);
       line-height: 1.5;
     }
   }
+}
+
+/* ─── Utility: Monospace for data ─────────────── */
+.font-data {
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
 }
 
 html {

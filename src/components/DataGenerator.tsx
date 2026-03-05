@@ -493,324 +493,329 @@ const calendarMonthNames = [
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
-// ─── Core helpers ──────────────────────────────────────────────────────────────
-const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+// ─── Core helpers (accept optional seeded RNG for deterministic output) ───────
+type RngFn = () => number;
 
-const generateRandomDate = (start: Date, end: Date) => {
-  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-};
+const pick = <T,>(arr: T[], rng: RngFn = Math.random): T =>
+  arr[Math.floor(rng() * arr.length)];
 
-const generateRandomNumber = (min: number, max: number) => {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
+const generateRandomDate = (start: Date, end: Date, rng: RngFn = Math.random) =>
+  new Date(start.getTime() + rng() * (end.getTime() - start.getTime()));
 
-const generateSSN = () => {
-  // Avoid SSA-invalid area numbers: 000, 666, 900-999
+const generateRandomNumber = (min: number, max: number, rng: RngFn = Math.random) =>
+  Math.floor(rng() * (max - min + 1)) + min;
+
+const generateSSN = (rng: RngFn = Math.random) => {
   let area: number;
-  do { area = generateRandomNumber(1, 899); } while (area === 666);
-  return `${area.toString().padStart(3, '0')}-${generateRandomNumber(10, 99)}-${generateRandomNumber(1000, 9999)}`;
+  do { area = generateRandomNumber(1, 899, rng); } while (area === 666);
+  return `${area.toString().padStart(3, '0')}-${generateRandomNumber(10, 99, rng)}-${generateRandomNumber(1000, 9999, rng)}`;
 };
 
-const generateEmployeeId = () => `EMP-${generateRandomNumber(10000, 99999)}`;
-const generateContractNumber = () => `CT-${new Date().getFullYear()}-${generateRandomNumber(10000, 99999)}`;
-const generatePermitNumber = () => `${new Date().getFullYear()}-BP-${generateRandomNumber(10000, 99999)}`;
-const generateLicenseNumber = () => `BL-${new Date().getFullYear().toString().slice(2)}-${generateRandomNumber(100000, 999999)}`;
-const generatePONumber = () => `PO-${new Date().getFullYear()}-${generateRandomNumber(10000, 99999)}`;
-const generateInvoiceNumber = () => `INV-${new Date().getFullYear()}-${generateRandomNumber(10000, 99999)}`;
-const generateWorkOrderNumber = () => `WO-${new Date().getFullYear()}-${generateRandomNumber(10000, 99999)}`;
-const generateFiscalYear = (offset = 0) => {
-  const y = new Date().getFullYear() - generateRandomNumber(0, 3) + offset;
+const generateEmployeeId = (rng: RngFn = Math.random) => `EMP-${generateRandomNumber(10000, 99999, rng)}`;
+const generateContractNumber = (rng: RngFn = Math.random) => `CT-${new Date().getFullYear()}-${generateRandomNumber(10000, 99999, rng)}`;
+const generatePermitNumber = (rng: RngFn = Math.random) => `${new Date().getFullYear()}-BP-${generateRandomNumber(10000, 99999, rng)}`;
+const generateLicenseNumber = (rng: RngFn = Math.random) => `BL-${new Date().getFullYear().toString().slice(2)}-${generateRandomNumber(100000, 999999, rng)}`;
+const generatePONumber = (rng: RngFn = Math.random) => `PO-${new Date().getFullYear()}-${generateRandomNumber(10000, 99999, rng)}`;
+const generateInvoiceNumber = (rng: RngFn = Math.random) => `INV-${new Date().getFullYear()}-${generateRandomNumber(10000, 99999, rng)}`;
+const generateWorkOrderNumber = (rng: RngFn = Math.random) => `WO-${new Date().getFullYear()}-${generateRandomNumber(10000, 99999, rng)}`;
+const generateFiscalYear = (offset = 0, rng: RngFn = Math.random) => {
+  const y = new Date().getFullYear() - generateRandomNumber(0, 3, rng) + offset;
   return `FY${y}-${(y + 1).toString().slice(2)}`;
 };
 
-const generateAssetTag = (assetType: string) => {
+const generateAssetTag = (assetType: string, rng: RngFn = Math.random) => {
   const prefixMap: Record<string, string> = {
     'Vehicle': 'VEH', 'Building': 'BLD', 'Technology': 'TEC',
     'Equipment': 'EQP', 'Machinery': 'MCH', 'Infrastructure': 'INF',
     'Land': 'LND', 'Facility': 'FAC',
   };
   const prefix = prefixMap[assetType] || 'AST';
-  return `${prefix}-${generateRandomNumber(10000, 99999)}`;
+  return `${prefix}-${generateRandomNumber(10000, 99999, rng)}`;
 };
 
-const generateSerialNumber = (assetType: string) => {
+const generateSerialNumber = (assetType: string, rng: RngFn = Math.random) => {
   const prefixMap: Record<string, string> = {
     'Vehicle': 'VIN', 'Technology': 'SN', 'Equipment': 'EQ',
     'Machinery': 'MFG', 'Facility': 'FA', 'Building': 'BLD',
     'Infrastructure': 'INF', 'Land': 'APN',
   };
   const prefix = prefixMap[assetType] || 'SN';
-  return `${prefix}-${generateRandomNumber(10000, 99999)}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+  const suffix = Math.floor(rng() * 1679616).toString(36).padStart(4, '0').substring(0, 4).toUpperCase();
+  return `${prefix}-${generateRandomNumber(10000, 99999, rng)}-${suffix}`;
 };
 
-const generatePhone = (areaCode: string) =>
-  `(${areaCode}) ${generateRandomNumber(200, 999)}-${generateRandomNumber(1000, 9999)}`;
+const generatePhone = (areaCode: string, rng: RngFn = Math.random) =>
+  `(${areaCode}) ${generateRandomNumber(200, 999, rng)}-${generateRandomNumber(1000, 9999, rng)}`;
 
-const generateAddress = () =>
-  `${generateRandomNumber(100, 9999)} ${pick(streetNames)} ${pick(streetTypes)}`;
+const generateAddress = (rng: RngFn = Math.random) =>
+  `${generateRandomNumber(100, 9999, rng)} ${pick(streetNames, rng)} ${pick(streetTypes, rng)}`;
 
-const generateFinancialAmount = (min: number, max: number) =>
-  parseFloat((Math.random() * (max - min) + min).toFixed(2));
+const generateFinancialAmount = (min: number, max: number, rng: RngFn = Math.random) =>
+  parseFloat((rng() * (max - min) + min).toFixed(2));
 
-const generateAccountNumber = (category: string) => {
+const generateAccountNumber = (category: string, rng: RngFn = Math.random) => {
   const prefixes: Record<string, string> = {
     assets: '1', liabilities: '2', equity: '3', revenue: '4', expenses: '5',
   };
   const p = prefixes[category] || '0';
-  return `${p}${generateRandomNumber(1000, 4999).toString().padStart(4, '0')}`;
+  return `${p}${generateRandomNumber(1000, 4999, rng).toString().padStart(4, '0')}`;
 };
 
 // ─── Main export ───────────────────────────────────────────────────────────────
-export const generateMockData = (type: string, count: number, fields: string[]) => {
+export const generateMockData = (type: string, count: number, fields: string[], rng: RngFn = Math.random) => {
   const data = [];
+
+  // When fields is empty, include all fields (treat [] as "no filter")
+  const includeAll = fields.length === 0;
+  const has = (f: string) => includeAll || fields.includes(f);
 
   for (let i = 0; i < count; i++) {
     let record: Record<string, unknown> = {};
-    const loc = pick(locationData);
+    const loc = pick(locationData, rng);
 
     switch (type) {
       case 'citizens': {
-        const firstName = pick(firstNames);
-        const lastName  = pick(lastNames);
-        if (fields.includes('id'))              record.id              = i + 1;
-        if (fields.includes('firstName'))       record.firstName       = firstName;
-        if (fields.includes('lastName'))        record.lastName        = lastName;
-        if (fields.includes('ssn'))             record.ssn             = generateSSN();
-        if (fields.includes('dateOfBirth'))     record.dateOfBirth     = generateRandomDate(new Date(1945, 0, 1), new Date(2005, 11, 31)).toISOString().split('T')[0];
-        if (fields.includes('address'))         record.address         = generateAddress();
-        if (fields.includes('city'))            record.city            = loc.city;
-        if (fields.includes('state'))           record.state           = loc.state;
-        if (fields.includes('zipCode'))         record.zipCode         = `${loc.zipPrefix}${generateRandomNumber(10, 99)}`;
-        if (fields.includes('phone'))           record.phone           = generatePhone(loc.areaCode);
-        if (fields.includes('voterRegistered')) record.voterRegistered = Math.random() > 0.28;
+        const firstName = pick(firstNames, rng);
+        const lastName  = pick(lastNames, rng);
+        if (has('id'))              record.id              = i + 1;
+        if (has('firstName'))       record.firstName       = firstName;
+        if (has('lastName'))        record.lastName        = lastName;
+        if (has('ssn'))             record.ssn             = generateSSN(rng);
+        if (has('dateOfBirth'))     record.dateOfBirth     = generateRandomDate(new Date(1945, 0, 1), new Date(2005, 11, 31), rng).toISOString().split('T')[0];
+        if (has('address'))         record.address         = generateAddress(rng);
+        if (has('city'))            record.city            = loc.city;
+        if (has('state'))           record.state           = loc.state;
+        if (has('zipCode'))         record.zipCode         = `${loc.zipPrefix}${generateRandomNumber(10, 99, rng)}`;
+        if (has('phone'))           record.phone           = generatePhone(loc.areaCode, rng);
+        if (has('voterRegistered')) record.voterRegistered = rng() > 0.28;
         break;
       }
 
       case 'employees': {
-        const firstName  = pick(firstNames);
-        const lastName   = pick(lastNames);
-        const dept       = pick(departments);
+        const firstName  = pick(firstNames, rng);
+        const lastName   = pick(lastNames, rng);
+        const dept       = pick(departments, rng);
         const positions  = positionsByDepartment[dept] ?? positionsByDepartment['Finance'];
-        const position   = pick(positions);
-        if (fields.includes('id'))             record.id             = i + 1;
-        if (fields.includes('employeeId'))     record.employeeId     = generateEmployeeId();
-        if (fields.includes('firstName'))      record.firstName      = firstName;
-        if (fields.includes('lastName'))       record.lastName       = lastName;
-        if (fields.includes('department'))     record.department     = dept;
-        if (fields.includes('position'))       record.position       = position.title;
-        if (fields.includes('hireDate'))       record.hireDate       = generateRandomDate(new Date(2005, 0, 1), new Date()).toISOString().split('T')[0];
-        if (fields.includes('salary'))         record.salary         = generateRandomNumber(position.min, position.max);
-        if (fields.includes('email'))          record.email          = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${loc.city.toLowerCase().replace(/\s/g, '')}.gov`;
-        if (fields.includes('phone'))          record.phone          = generatePhone(loc.areaCode);
-        if (fields.includes('clearanceLevel')) record.clearanceLevel = pick(['Public', 'Confidential', 'Secret', 'Top Secret']);
+        const position   = pick(positions, rng);
+        if (has('id'))             record.id             = i + 1;
+        if (has('employeeId'))     record.employeeId     = generateEmployeeId(rng);
+        if (has('firstName'))      record.firstName      = firstName;
+        if (has('lastName'))       record.lastName       = lastName;
+        if (has('department'))     record.department     = dept;
+        if (has('position'))       record.position       = position.title;
+        if (has('hireDate'))       record.hireDate       = generateRandomDate(new Date(2005, 0, 1), new Date(), rng).toISOString().split('T')[0];
+        if (has('salary'))         record.salary         = generateRandomNumber(position.min, position.max, rng);
+        if (has('email'))          record.email          = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${loc.city.toLowerCase().replace(/\s/g, '')}.gov`;
+        if (has('phone'))          record.phone          = generatePhone(loc.areaCode, rng);
+        if (has('clearanceLevel')) record.clearanceLevel = pick(['Public', 'Confidential', 'Secret', 'Top Secret'], rng);
         break;
       }
 
       case 'services': {
-        const serviceName = pick(serviceTypes);
-        const dept        = pick(departments);
-        if (fields.includes('id'))               record.id               = i + 1;
-        if (fields.includes('serviceName'))      record.serviceName      = serviceName;
-        if (fields.includes('department'))       record.department       = dept;
-        if (fields.includes('description'))      record.description      = `${serviceName} services administered by the ${dept} department`;
-        if (fields.includes('isActive'))         record.isActive         = Math.random() > 0.08;
-        if (fields.includes('budget'))           record.budget           = generateFinancialAmount(50000, 4500000);
-        if (fields.includes('contactPhone'))     record.contactPhone     = generatePhone(loc.areaCode);
-        if (fields.includes('website'))          record.website          = `https://${loc.city.toLowerCase().replace(/\s/g, '')}.gov/${serviceName.toLowerCase().replace(/[\s&]+/g, '-')}`;
-        if (fields.includes('hoursOfOperation')) record.hoursOfOperation = pick(['Mon-Fri 8:00 AM – 5:00 PM', 'Mon-Fri 7:30 AM – 4:30 PM', '24 / 7 Emergency Line', 'Mon-Fri 9:00 AM – 3:00 PM', 'Mon-Sat 7:00 AM – 6:00 PM']);
+        const serviceName = pick(serviceTypes, rng);
+        const dept        = pick(departments, rng);
+        if (has('id'))               record.id               = i + 1;
+        if (has('serviceName'))      record.serviceName      = serviceName;
+        if (has('department'))       record.department       = dept;
+        if (has('description'))      record.description      = `${serviceName} services administered by the ${dept} department`;
+        if (has('isActive'))         record.isActive         = rng() > 0.08;
+        if (has('budget'))           record.budget           = generateFinancialAmount(50000, 4500000, rng);
+        if (has('contactPhone'))     record.contactPhone     = generatePhone(loc.areaCode, rng);
+        if (has('website'))          record.website          = `https://${loc.city.toLowerCase().replace(/\s/g, '')}.gov/${serviceName.toLowerCase().replace(/[\s&]+/g, '-')}`;
+        if (has('hoursOfOperation')) record.hoursOfOperation = pick(['Mon-Fri 8:00 AM – 5:00 PM', 'Mon-Fri 7:30 AM – 4:30 PM', '24 / 7 Emergency Line', 'Mon-Fri 9:00 AM – 3:00 PM', 'Mon-Sat 7:00 AM – 6:00 PM'], rng);
         break;
       }
 
       case 'contracts': {
-        const vendor       = pick(vendors);
-        const contractType = pick(contractTypes);
-        const dept         = pick(departments);
-        const startDate    = generateRandomDate(new Date(2022, 0, 1), new Date());
-        const endDate      = generateRandomDate(startDate, new Date(startDate.getTime() + 730 * 24 * 60 * 60 * 1000));
-        if (fields.includes('id'))             record.id             = i + 1;
-        if (fields.includes('contractNumber')) record.contractNumber = generateContractNumber();
-        if (fields.includes('vendor'))         record.vendor         = vendor;
-        if (fields.includes('contractType'))   record.contractType   = contractType;
-        if (fields.includes('value'))          record.value          = generateFinancialAmount(15000, 4500000);
-        if (fields.includes('startDate'))      record.startDate      = startDate.toISOString().split('T')[0];
-        if (fields.includes('endDate'))        record.endDate        = endDate.toISOString().split('T')[0];
-        if (fields.includes('status'))         record.status         = pick(['Active', 'Pending Award', 'Completed', 'Cancelled', 'Under Review', 'Renewal Pending']);
-        if (fields.includes('department'))     record.department     = dept;
-        if (fields.includes('description'))    record.description    = `${contractType} services contract – ${dept}`;
+        const vendor       = pick(vendors, rng);
+        const contractType = pick(contractTypes, rng);
+        const dept         = pick(departments, rng);
+        const startDate    = generateRandomDate(new Date(2022, 0, 1), new Date(), rng);
+        const endDate      = generateRandomDate(startDate, new Date(startDate.getTime() + 730 * 24 * 60 * 60 * 1000), rng);
+        if (has('id'))             record.id             = i + 1;
+        if (has('contractNumber')) record.contractNumber = generateContractNumber(rng);
+        if (has('vendor'))         record.vendor         = vendor;
+        if (has('contractType'))   record.contractType   = contractType;
+        if (has('value'))          record.value          = generateFinancialAmount(15000, 4500000, rng);
+        if (has('startDate'))      record.startDate      = startDate.toISOString().split('T')[0];
+        if (has('endDate'))        record.endDate        = endDate.toISOString().split('T')[0];
+        if (has('status'))         record.status         = pick(['Active', 'Pending Award', 'Completed', 'Cancelled', 'Under Review', 'Renewal Pending'], rng);
+        if (has('department'))     record.department     = dept;
+        if (has('description'))    record.description    = `${contractType} services contract – ${dept}`;
         break;
       }
 
       case 'municipalAssets': {
-        const assetType = pick(assetTypes);
+        const assetType = pick(assetTypes, rng);
         const descriptions = assetsByType[assetType];
-        const description  = pick(descriptions);
-        const dept         = pick(departments);
-        const purchaseDate = generateRandomDate(new Date(2010, 0, 1), new Date());
-        const purchaseValue = generateFinancialAmount(5000, 850000);
+        const description  = pick(descriptions, rng);
+        const dept         = pick(departments, rng);
+        const purchaseDate = generateRandomDate(new Date(2010, 0, 1), new Date(), rng);
+        const purchaseValue = generateFinancialAmount(5000, 850000, rng);
         const yearsOld = (Date.now() - purchaseDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000);
         const depRate  = assetType === 'Land' ? 1.0 : Math.max(0.15, 1 - yearsOld * 0.07);
-        if (fields.includes('id'))            record.id            = i + 1;
-        if (fields.includes('assetTag'))      record.assetTag      = generateAssetTag(assetType);
-        if (fields.includes('assetType'))     record.assetType     = assetType;
-        if (fields.includes('description'))   record.description   = description;
-        if (fields.includes('department'))    record.department    = dept;
-        if (fields.includes('purchaseDate'))  record.purchaseDate  = purchaseDate.toISOString().split('T')[0];
-        if (fields.includes('purchaseValue')) record.purchaseValue = parseFloat(purchaseValue.toFixed(2));
-        if (fields.includes('currentValue'))  record.currentValue  = parseFloat((purchaseValue * depRate).toFixed(2));
-        if (fields.includes('condition'))     record.condition     = pick(['Excellent', 'Good', 'Fair', 'Poor', 'Needs Replacement']);
-        if (fields.includes('location'))      record.location      = `${loc.city} – ${dept}`;
-        if (fields.includes('serialNumber'))  record.serialNumber  = generateSerialNumber(assetType);
+        if (has('id'))            record.id            = i + 1;
+        if (has('assetTag'))      record.assetTag      = generateAssetTag(assetType, rng);
+        if (has('assetType'))     record.assetType     = assetType;
+        if (has('description'))   record.description   = description;
+        if (has('department'))    record.department    = dept;
+        if (has('purchaseDate'))  record.purchaseDate  = purchaseDate.toISOString().split('T')[0];
+        if (has('purchaseValue')) record.purchaseValue = parseFloat(purchaseValue.toFixed(2));
+        if (has('currentValue'))  record.currentValue  = parseFloat((purchaseValue * depRate).toFixed(2));
+        if (has('condition'))     record.condition     = pick(['Excellent', 'Good', 'Fair', 'Poor', 'Needs Replacement'], rng);
+        if (has('location'))      record.location      = `${loc.city} – ${dept}`;
+        if (has('serialNumber'))  record.serialNumber  = generateSerialNumber(assetType, rng);
         break;
       }
 
       case 'budget': {
-        const dept = pick(departments);
-        const fy   = new Date().getFullYear() - generateRandomNumber(0, 3);
+        const dept = pick(departments, rng);
+        const fy   = new Date().getFullYear() - generateRandomNumber(0, 3, rng);
         const fyLabel = `FY${fy}-${(fy + 1).toString().slice(2)}`;
-        const budgeted = generateFinancialAmount(80000, 4500000);
-        const spentPct = 0.2 + Math.random() * 0.75;
+        const budgeted = generateFinancialAmount(80000, 4500000, rng);
+        const spentPct = 0.2 + rng() * 0.75;
         const spent    = parseFloat((budgeted * spentPct).toFixed(2));
-        if (fields.includes('id'))             record.id             = i + 1;
-        if (fields.includes('fiscalYear'))     record.fiscalYear     = fyLabel;
-        if (fields.includes('department'))     record.department     = dept;
-        if (fields.includes('category'))       record.category       = pick(['Personnel', 'Operations', 'Capital Projects', 'Utilities', 'Supplies & Materials', 'Contract Services', 'Equipment', 'Maintenance & Repair']);
-        if (fields.includes('budgetedAmount')) record.budgetedAmount = parseFloat(budgeted.toFixed(2));
-        if (fields.includes('spentAmount'))    record.spentAmount    = spent;
-        if (fields.includes('remainingAmount'))record.remainingAmount= parseFloat((budgeted - spent).toFixed(2));
-        if (fields.includes('percentSpent'))   record.percentSpent   = parseFloat((spentPct * 100).toFixed(1));
-        if (fields.includes('lastUpdated'))    record.lastUpdated    = generateRandomDate(new Date(2024, 0, 1), new Date()).toISOString().split('T')[0];
-        if (fields.includes('status'))         record.status         = spentPct > 0.95 ? 'Over Budget' : spentPct > 0.80 ? 'Near Limit' : 'On Track';
+        if (has('id'))             record.id             = i + 1;
+        if (has('fiscalYear'))     record.fiscalYear     = fyLabel;
+        if (has('department'))     record.department     = dept;
+        if (has('category'))       record.category       = pick(['Personnel', 'Operations', 'Capital Projects', 'Utilities', 'Supplies & Materials', 'Contract Services', 'Equipment', 'Maintenance & Repair'], rng);
+        if (has('budgetedAmount')) record.budgetedAmount = parseFloat(budgeted.toFixed(2));
+        if (has('spentAmount'))    record.spentAmount    = spent;
+        if (has('remainingAmount'))record.remainingAmount= parseFloat((budgeted - spent).toFixed(2));
+        if (has('percentSpent'))   record.percentSpent   = parseFloat((spentPct * 100).toFixed(1));
+        if (has('lastUpdated'))    record.lastUpdated    = generateRandomDate(new Date(2024, 0, 1), new Date(), rng).toISOString().split('T')[0];
+        if (has('status'))         record.status         = spentPct > 0.95 ? 'Over Budget' : spentPct > 0.80 ? 'Near Limit' : 'On Track';
         break;
       }
 
       case 'permits': {
-        const permitType = pick(permitTypes);
+        const permitType = pick(permitTypes, rng);
         const feeRange   = permitFeeRanges[permitType] ?? { min: 100, max: 2000 };
-        const appDate    = generateRandomDate(new Date(2022, 0, 1), new Date());
-        const issued     = Math.random() > 0.25;
-        const issueDate  = issued ? generateRandomDate(appDate, new Date(appDate.getTime() + 45 * 24 * 60 * 60 * 1000)) : null;
-        if (fields.includes('id'))              record.id              = i + 1;
-        if (fields.includes('permitNumber'))    record.permitNumber    = generatePermitNumber();
-        if (fields.includes('permitType'))      record.permitType      = permitType;
-        if (fields.includes('applicantName'))   record.applicantName   = `${pick(firstNames)} ${pick(lastNames)}`;
-        if (fields.includes('propertyAddress')) record.propertyAddress = `${generateAddress()}, ${loc.city}, ${loc.state}`;
-        if (fields.includes('applicationDate')) record.applicationDate = appDate.toISOString().split('T')[0];
-        if (fields.includes('issueDate'))       record.issueDate       = issueDate ? issueDate.toISOString().split('T')[0] : null;
-        if (fields.includes('expirationDate'))  record.expirationDate  = issueDate
+        const appDate    = generateRandomDate(new Date(2022, 0, 1), new Date(), rng);
+        const issued     = rng() > 0.25;
+        const issueDate  = issued ? generateRandomDate(appDate, new Date(appDate.getTime() + 45 * 24 * 60 * 60 * 1000), rng) : null;
+        if (has('id'))              record.id              = i + 1;
+        if (has('permitNumber'))    record.permitNumber    = generatePermitNumber(rng);
+        if (has('permitType'))      record.permitType      = permitType;
+        if (has('applicantName'))   record.applicantName   = `${pick(firstNames, rng)} ${pick(lastNames, rng)}`;
+        if (has('propertyAddress')) record.propertyAddress = `${generateAddress(rng)}, ${loc.city}, ${loc.state}`;
+        if (has('applicationDate')) record.applicationDate = appDate.toISOString().split('T')[0];
+        if (has('issueDate'))       record.issueDate       = issueDate ? issueDate.toISOString().split('T')[0] : null;
+        if (has('expirationDate'))  record.expirationDate  = issueDate
           ? new Date(issueDate.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
           : null;
-        if (fields.includes('status'))          record.status          = pick(['Pending Review', 'Under Review', 'Approved', 'Issued', 'Denied', 'Expired', 'On Hold']);
-        if (fields.includes('feeAmount'))       record.feeAmount       = generateFinancialAmount(feeRange.min, feeRange.max);
-        if (fields.includes('inspector'))       record.inspector       = `${pick(firstNames)} ${pick(lastNames)}`;
-        if (fields.includes('description'))     record.description     = `${permitType} – ${generateAddress()}`;
+        if (has('status'))          record.status          = pick(['Pending Review', 'Under Review', 'Approved', 'Issued', 'Denied', 'Expired', 'On Hold'], rng);
+        if (has('feeAmount'))       record.feeAmount       = generateFinancialAmount(feeRange.min, feeRange.max, rng);
+        if (has('inspector'))       record.inspector       = `${pick(firstNames, rng)} ${pick(lastNames, rng)}`;
+        if (has('description'))     record.description     = `${permitType} – ${generateAddress(rng)}`;
         break;
       }
 
       case 'licenses': {
-        const licenseType  = pick(licenseTypes);
+        const licenseType  = pick(licenseTypes, rng);
         const feeRange     = licenseFeeRanges[licenseType] ?? { min: 100, max: 500 };
         const bizNames     = businessNamesByLicenseType[licenseType] ?? ['(Personal License)'];
-        const appDate      = generateRandomDate(new Date(2021, 0, 1), new Date());
-        const issued       = Math.random() > 0.15;
-        const issueDate    = issued ? generateRandomDate(appDate, new Date(appDate.getTime() + 60 * 24 * 60 * 60 * 1000)) : null;
-        if (fields.includes('id'))              record.id              = i + 1;
-        if (fields.includes('licenseNumber'))   record.licenseNumber   = generateLicenseNumber();
-        if (fields.includes('licenseType'))     record.licenseType     = licenseType;
-        if (fields.includes('businessName'))    record.businessName    = pick(bizNames);
-        if (fields.includes('ownerName'))       record.ownerName       = `${pick(firstNames)} ${pick(lastNames)}`;
-        if (fields.includes('businessAddress')) record.businessAddress = `${generateAddress()}, ${loc.city}, ${loc.state}`;
-        if (fields.includes('applicationDate')) record.applicationDate = appDate.toISOString().split('T')[0];
-        if (fields.includes('issueDate'))       record.issueDate       = issueDate ? issueDate.toISOString().split('T')[0] : null;
-        if (fields.includes('renewalDate'))     record.renewalDate     = issueDate
+        const appDate      = generateRandomDate(new Date(2021, 0, 1), new Date(), rng);
+        const issued       = rng() > 0.15;
+        const issueDate    = issued ? generateRandomDate(appDate, new Date(appDate.getTime() + 60 * 24 * 60 * 60 * 1000), rng) : null;
+        if (has('id'))              record.id              = i + 1;
+        if (has('licenseNumber'))   record.licenseNumber   = generateLicenseNumber(rng);
+        if (has('licenseType'))     record.licenseType     = licenseType;
+        if (has('businessName'))    record.businessName    = pick(bizNames, rng);
+        if (has('ownerName'))       record.ownerName       = `${pick(firstNames, rng)} ${pick(lastNames, rng)}`;
+        if (has('businessAddress')) record.businessAddress = `${generateAddress(rng)}, ${loc.city}, ${loc.state}`;
+        if (has('applicationDate')) record.applicationDate = appDate.toISOString().split('T')[0];
+        if (has('issueDate'))       record.issueDate       = issueDate ? issueDate.toISOString().split('T')[0] : null;
+        if (has('renewalDate'))     record.renewalDate     = issueDate
           ? new Date(issueDate.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
           : null;
-        if (fields.includes('status'))          record.status          = pick(['Active', 'Expired', 'Suspended', 'Pending Renewal', 'Under Review', 'Revoked']);
-        if (fields.includes('annualFee'))       record.annualFee       = generateFinancialAmount(feeRange.min, feeRange.max);
-        if (fields.includes('phone'))           record.phone           = generatePhone(loc.areaCode);
+        if (has('status'))          record.status          = pick(['Active', 'Expired', 'Suspended', 'Pending Renewal', 'Under Review', 'Revoked'], rng);
+        if (has('annualFee'))       record.annualFee       = generateFinancialAmount(feeRange.min, feeRange.max, rng);
+        if (has('phone'))           record.phone           = generatePhone(loc.areaCode, rng);
         break;
       }
 
       case 'purchaseOrders': {
-        const vendor  = pick(vendors);
-        const dept    = pick(departments);
-        const status  = pick(['Draft', 'Submitted', 'Approved', 'Ordered', 'Received', 'Cancelled']);
-        const orderDate = generateRandomDate(new Date(2023, 0, 1), new Date());
-        if (fields.includes('id'))           record.id           = i + 1;
-        if (fields.includes('poNumber'))     record.poNumber     = generatePONumber();
-        if (fields.includes('vendor'))       record.vendor       = vendor;
-        if (fields.includes('department'))   record.department   = dept;
-        if (fields.includes('description'))  record.description  = `${pick(contractTypes)} – ${dept}`;
-        if (fields.includes('orderDate'))    record.orderDate    = orderDate.toISOString().split('T')[0];
-        if (fields.includes('requestedBy'))  record.requestedBy  = `${pick(firstNames)} ${pick(lastNames)}`;
-        if (fields.includes('totalAmount'))  record.totalAmount  = generateFinancialAmount(500, 250000);
-        if (fields.includes('status'))       record.status       = status;
-        if (fields.includes('deliveryDate')) record.deliveryDate = generateRandomDate(orderDate, new Date(orderDate.getTime() + 90 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0];
-        if (fields.includes('approvedBy'))   record.approvedBy   = status === 'Draft' ? null : `${pick(firstNames)} ${pick(lastNames)}`;
+        const vendor  = pick(vendors, rng);
+        const dept    = pick(departments, rng);
+        const status  = pick(['Draft', 'Submitted', 'Approved', 'Ordered', 'Received', 'Cancelled'], rng);
+        const orderDate = generateRandomDate(new Date(2023, 0, 1), new Date(), rng);
+        if (has('id'))           record.id           = i + 1;
+        if (has('poNumber'))     record.poNumber     = generatePONumber(rng);
+        if (has('vendor'))       record.vendor       = vendor;
+        if (has('department'))   record.department   = dept;
+        if (has('description'))  record.description  = `${pick(contractTypes, rng)} – ${dept}`;
+        if (has('orderDate'))    record.orderDate    = orderDate.toISOString().split('T')[0];
+        if (has('requestedBy'))  record.requestedBy  = `${pick(firstNames, rng)} ${pick(lastNames, rng)}`;
+        if (has('totalAmount'))  record.totalAmount  = generateFinancialAmount(500, 250000, rng);
+        if (has('status'))       record.status       = status;
+        if (has('deliveryDate')) record.deliveryDate = generateRandomDate(orderDate, new Date(orderDate.getTime() + 90 * 24 * 60 * 60 * 1000), rng).toISOString().split('T')[0];
+        if (has('approvedBy'))   record.approvedBy   = status === 'Draft' ? null : `${pick(firstNames, rng)} ${pick(lastNames, rng)}`;
         break;
       }
 
       case 'invoices': {
-        const vendor      = pick(vendors);
-        const status      = pick(['Pending', 'Approved', 'Paid', 'Overdue', 'Disputed']);
-        const invoiceDate = generateRandomDate(new Date(2023, 0, 1), new Date());
+        const vendor      = pick(vendors, rng);
+        const status      = pick(['Pending', 'Approved', 'Paid', 'Overdue', 'Disputed'], rng);
+        const invoiceDate = generateRandomDate(new Date(2023, 0, 1), new Date(), rng);
         const dueDate     = new Date(invoiceDate.getTime() + 30 * 24 * 60 * 60 * 1000);
-        if (fields.includes('id'))            record.id            = i + 1;
-        if (fields.includes('invoiceNumber')) record.invoiceNumber = generateInvoiceNumber();
-        if (fields.includes('vendor'))        record.vendor        = vendor;
-        if (fields.includes('poNumber'))      record.poNumber      = generatePONumber();
-        if (fields.includes('invoiceDate'))   record.invoiceDate   = invoiceDate.toISOString().split('T')[0];
-        if (fields.includes('dueDate'))       record.dueDate       = dueDate.toISOString().split('T')[0];
-        if (fields.includes('amount'))        record.amount        = generateFinancialAmount(250, 85000);
-        if (fields.includes('status'))        record.status        = status;
-        if (fields.includes('department'))    record.department    = pick(departments);
-        if (fields.includes('description'))   record.description   = `Invoice for ${pick(contractTypes).toLowerCase()} services`;
-        if (fields.includes('paymentDate'))   record.paymentDate   = status === 'Paid'
-          ? generateRandomDate(invoiceDate, new Date()).toISOString().split('T')[0]
+        if (has('id'))            record.id            = i + 1;
+        if (has('invoiceNumber')) record.invoiceNumber = generateInvoiceNumber(rng);
+        if (has('vendor'))        record.vendor        = vendor;
+        if (has('poNumber'))      record.poNumber      = generatePONumber(rng);
+        if (has('invoiceDate'))   record.invoiceDate   = invoiceDate.toISOString().split('T')[0];
+        if (has('dueDate'))       record.dueDate       = dueDate.toISOString().split('T')[0];
+        if (has('amount'))        record.amount        = generateFinancialAmount(250, 85000, rng);
+        if (has('status'))        record.status        = status;
+        if (has('department'))    record.department    = pick(departments, rng);
+        if (has('description'))   record.description   = `Invoice for ${pick(contractTypes, rng).toLowerCase()} services`;
+        if (has('paymentDate'))   record.paymentDate   = status === 'Paid'
+          ? generateRandomDate(invoiceDate, new Date(), rng).toISOString().split('T')[0]
           : null;
         break;
       }
 
       case 'inventory': {
-        const category = pick(inventoryCategories);
+        const category = pick(inventoryCategories, rng);
         const items    = inventoryItemsByCategory[category];
-        const item     = pick(items);
-        const qty      = generateRandomNumber(0, 250);
-        const unitPrice = generateFinancialAmount(item.unitPrice[0], item.unitPrice[1]);
-        const itemCode  = `${category.substring(0, 3).toUpperCase().replace(/\s/g,'')}-${generateRandomNumber(10000, 99999)}`;
-        if (fields.includes('id'))           record.id           = i + 1;
-        if (fields.includes('itemCode'))     record.itemCode     = itemCode;
-        if (fields.includes('itemName'))     record.itemName     = item.name;
-        if (fields.includes('category'))     record.category     = category;
-        if (fields.includes('description'))  record.description  = item.name;
-        if (fields.includes('quantity'))     record.quantity     = qty;
-        if (fields.includes('unitPrice'))    record.unitPrice    = parseFloat(unitPrice.toFixed(2));
-        if (fields.includes('totalValue'))   record.totalValue   = parseFloat((qty * unitPrice).toFixed(2));
-        if (fields.includes('location'))     record.location     = `Warehouse ${pick(['A', 'B', 'C', 'D'])}-${generateRandomNumber(1, 30).toString().padStart(2, '0')}`;
-        if (fields.includes('reorderLevel')) record.reorderLevel = generateRandomNumber(5, 50);
-        if (fields.includes('supplier'))     record.supplier     = pick(inventorySuppliers);
-        if (fields.includes('lastUpdated'))  record.lastUpdated  = generateRandomDate(new Date(2024, 0, 1), new Date()).toISOString().split('T')[0];
+        const item     = pick(items, rng);
+        const qty      = generateRandomNumber(0, 250, rng);
+        const unitPrice = generateFinancialAmount(item.unitPrice[0], item.unitPrice[1], rng);
+        const itemCode  = `${category.substring(0, 3).toUpperCase().replace(/\s/g,'')}-${generateRandomNumber(10000, 99999, rng)}`;
+        if (has('id'))           record.id           = i + 1;
+        if (has('itemCode'))     record.itemCode     = itemCode;
+        if (has('itemName'))     record.itemName     = item.name;
+        if (has('category'))     record.category     = category;
+        if (has('description'))  record.description  = item.name;
+        if (has('quantity'))     record.quantity     = qty;
+        if (has('unitPrice'))    record.unitPrice    = parseFloat(unitPrice.toFixed(2));
+        if (has('totalValue'))   record.totalValue   = parseFloat((qty * unitPrice).toFixed(2));
+        if (has('location'))     record.location     = `Warehouse ${pick(['A', 'B', 'C', 'D'], rng)}-${generateRandomNumber(1, 30, rng).toString().padStart(2, '0')}`;
+        if (has('reorderLevel')) record.reorderLevel = generateRandomNumber(5, 50, rng);
+        if (has('supplier'))     record.supplier     = pick(inventorySuppliers, rng);
+        if (has('lastUpdated'))  record.lastUpdated  = generateRandomDate(new Date(2024, 0, 1), new Date(), rng).toISOString().split('T')[0];
         break;
       }
 
       case 'workOrders': {
-        const woType    = pick(workOrderTypes);
+        const woType    = pick(workOrderTypes, rng);
         const descs     = workOrderDescriptionsByType[woType];
-        const status    = pick(['Open', 'In Progress', 'Completed', 'On Hold', 'Cancelled']);
-        const reqDate   = generateRandomDate(new Date(2023, 0, 1), new Date());
-        const schedDate = generateRandomDate(reqDate, new Date(reqDate.getTime() + 21 * 24 * 60 * 60 * 1000));
-        if (fields.includes('id'))              record.id              = i + 1;
-        if (fields.includes('workOrderNumber')) record.workOrderNumber = generateWorkOrderNumber();
-        if (fields.includes('workOrderType'))   record.workOrderType   = woType;
-        if (fields.includes('description'))     record.description     = pick(descs);
-        if (fields.includes('location'))        record.location        = pick(workOrderLocations);
-        if (fields.includes('requestDate'))     record.requestDate     = reqDate.toISOString().split('T')[0];
-        if (fields.includes('scheduledDate'))   record.scheduledDate   = schedDate.toISOString().split('T')[0];
-        if (fields.includes('assignedTo'))      record.assignedTo      = `${pick(firstNames)} ${pick(lastNames)}`;
-        if (fields.includes('priority'))        record.priority        = pick(['Low', 'Medium', 'High', 'Emergency']);
-        if (fields.includes('status'))          record.status          = status;
-        if (fields.includes('estimatedCost'))   record.estimatedCost   = generateFinancialAmount(150, 45000);
-        if (fields.includes('completionDate'))  record.completionDate  = status === 'Completed'
-          ? generateRandomDate(schedDate, new Date()).toISOString().split('T')[0]
+        const status    = pick(['Open', 'In Progress', 'Completed', 'On Hold', 'Cancelled'], rng);
+        const reqDate   = generateRandomDate(new Date(2023, 0, 1), new Date(), rng);
+        const schedDate = generateRandomDate(reqDate, new Date(reqDate.getTime() + 21 * 24 * 60 * 60 * 1000), rng);
+        if (has('id'))              record.id              = i + 1;
+        if (has('workOrderNumber')) record.workOrderNumber = generateWorkOrderNumber(rng);
+        if (has('workOrderType'))   record.workOrderType   = woType;
+        if (has('description'))     record.description     = pick(descs, rng);
+        if (has('location'))        record.location        = pick(workOrderLocations, rng);
+        if (has('requestDate'))     record.requestDate     = reqDate.toISOString().split('T')[0];
+        if (has('scheduledDate'))   record.scheduledDate   = schedDate.toISOString().split('T')[0];
+        if (has('assignedTo'))      record.assignedTo      = `${pick(firstNames, rng)} ${pick(lastNames, rng)}`;
+        if (has('priority'))        record.priority        = pick(['Low', 'Medium', 'High', 'Emergency'], rng);
+        if (has('status'))          record.status          = status;
+        if (has('estimatedCost'))   record.estimatedCost   = generateFinancialAmount(150, 45000, rng);
+        if (has('completionDate'))  record.completionDate  = status === 'Completed'
+          ? generateRandomDate(schedDate, new Date(), rng).toISOString().split('T')[0]
           : null;
         break;
       }
@@ -818,74 +823,72 @@ export const generateMockData = (type: string, count: number, fields: string[]) 
       case 'balanceSheet': {
         const sectionMap: Array<'assets' | 'liabilities' | 'equity'> = ['assets', 'liabilities', 'equity'];
         const section = sectionMap[i < Math.floor(count / 3) ? 0 : i < Math.floor((count * 2) / 3) ? 1 : 2];
-        // Prior and current period are correlated (±12% year-over-year change)
-        const current  = generateFinancialAmount(50000, 8000000);
-        const changeMultiplier = 0.88 + Math.random() * 0.24; // 0.88–1.12
+        const current  = generateFinancialAmount(50000, 8000000, rng);
+        const changeMultiplier = 0.88 + rng() * 0.24;
         const prior    = parseFloat((current * changeMultiplier).toFixed(2));
         const change   = parseFloat((current - prior).toFixed(2));
-        if (fields.includes('id'))            record.id            = i + 1;
-        if (fields.includes('accountNumber')) record.accountNumber = generateAccountNumber(section);
-        if (fields.includes('accountName'))   record.accountName   = pick(accountNames[section]);
-        if (fields.includes('category')) {
+        if (has('id'))            record.id            = i + 1;
+        if (has('accountNumber')) record.accountNumber = generateAccountNumber(section, rng);
+        if (has('accountName'))   record.accountName   = pick(accountNames[section], rng);
+        if (has('category')) {
           const catMap = {
             assets: assetCategories,
             liabilities: ['Current Liabilities', 'Long-term Liabilities', 'Contingent Liabilities'],
             equity: ['Contributed Capital', 'Retained Earnings', 'Accumulated Other Comprehensive Income'],
           };
-          record.category = pick(catMap[section]);
+          record.category = pick(catMap[section], rng);
         }
-        if (fields.includes('currentPeriod')) record.currentPeriod = current;
-        if (fields.includes('priorPeriod'))   record.priorPeriod   = prior;
-        if (fields.includes('change'))        record.change        = change;
-        if (fields.includes('changePercent')) record.changePercent = parseFloat(((change / prior) * 100).toFixed(2));
-        if (fields.includes('fiscalYear'))    record.fiscalYear    = generateFiscalYear();
-        if (fields.includes('fund'))          record.fund          = pick(['General Fund', 'Special Revenue Fund', 'Capital Projects Fund', 'Debt Service Fund', 'Enterprise Fund']);
-        if (fields.includes('department'))    record.department    = pick(departments);
-        if (fields.includes('notes'))         record.notes         = `Balance as of ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+        if (has('currentPeriod')) record.currentPeriod = current;
+        if (has('priorPeriod'))   record.priorPeriod   = prior;
+        if (has('change'))        record.change        = change;
+        if (has('changePercent')) record.changePercent = parseFloat(((change / prior) * 100).toFixed(2));
+        if (has('fiscalYear'))    record.fiscalYear    = generateFiscalYear(0, rng);
+        if (has('fund'))          record.fund          = pick(['General Fund', 'Special Revenue Fund', 'Capital Projects Fund', 'Debt Service Fund', 'Enterprise Fund'], rng);
+        if (has('department'))    record.department    = pick(departments, rng);
+        if (has('notes'))         record.notes         = `Balance as of ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
         break;
       }
 
       case 'incomeStatement': {
-        const fund        = pick(incomeStatementFunds);
-        const func        = pick(incomeStatementFunctions);
-        const division    = pick(incomeStatementDivisions);
-        const program     = pick(incomeStatementPrograms);
-        const location    = pick(incomeStatementLocations);
-        const doeFunc     = pick(doeFunctionCodes);
-        const grade       = pick(incomeStatementGrades);
-        const object      = pick(incomeStatementObjects);
-        const calIdx      = generateRandomNumber(0, 11);
+        const fund        = pick(incomeStatementFunds, rng);
+        const func        = pick(incomeStatementFunctions, rng);
+        const division    = pick(incomeStatementDivisions, rng);
+        const program     = pick(incomeStatementPrograms, rng);
+        const location    = pick(incomeStatementLocations, rng);
+        const doeFunc     = pick(doeFunctionCodes, rng);
+        const grade       = pick(incomeStatementGrades, rng);
+        const object      = pick(incomeStatementObjects, rng);
+        const calIdx      = generateRandomNumber(0, 11, rng);
         const calendarMonth    = calendarMonthNames[calIdx];
-        // Fiscal year starts in July (month index 6): fiscal month 1 = July
         const fiscalMonth      = ((calIdx - 6 + 12) % 12) + 1;
-        const fiscalCalendarName = pick(fiscalCalendarNames);
-        const fiscalYear       = fiscalCalendarName.split(' ')[0]; // e.g. "2024-25"
-        const accountType      = fiscalYear && Math.random() > 0.45 ? 'Revenue' : 'Expenditure';
-        const acctNum          = generateRandomNumber(1000, 9999).toString();
-        const fundCode         = fund.split(' ')[0];       // "01"
-        const objectCode       = object.split(' ')[0];     // "1000"
-        const locationCode     = location.split(' ')[0];   // "0100"
+        const fiscalCalendarName = pick(fiscalCalendarNames, rng);
+        const fiscalYear       = fiscalCalendarName.split(' ')[0];
+        const accountType      = fiscalYear && rng() > 0.45 ? 'Revenue' : 'Expenditure';
+        const acctNum          = generateRandomNumber(1000, 9999, rng).toString();
+        const fundCode         = fund.split(' ')[0];
+        const objectCode       = object.split(' ')[0];
+        const locationCode     = location.split(' ')[0];
         const fullAccount      = `${fundCode}-${doeFunc}-${objectCode}-${locationCode}`;
         const accountDescription = `${accountType} – ${func} – ${program}`;
-        if (fields.includes('id'))                  record.id                  = i + 1;
-        if (fields.includes('accountType'))         record.accountType         = accountType;
-        if (fields.includes('fund'))                record.fund                = fund;
-        if (fields.includes('function'))            record['function']         = func;
-        if (fields.includes('department'))          record.department          = pick(departments);
-        if (fields.includes('division'))            record.division            = division;
-        if (fields.includes('program'))             record.program             = program;
-        if (fields.includes('location'))            record.location            = location;
-        if (fields.includes('doeFunc'))             record.doeFunc             = doeFunc;
-        if (fields.includes('grade'))               record.grade               = grade;
-        if (fields.includes('object'))              record['object']           = object;
-        if (fields.includes('characterCode'))       record.characterCode       = generateRandomNumber(1, 9).toString();
-        if (fields.includes('account'))             record.account             = acctNum;
-        if (fields.includes('fullAccount'))         record.fullAccount         = fullAccount;
-        if (fields.includes('accountDescription')) record.accountDescription   = accountDescription;
-        if (fields.includes('fiscalCalendarName')) record.fiscalCalendarName   = fiscalCalendarName;
-        if (fields.includes('fiscalYear'))          record.fiscalYear          = fiscalYear;
-        if (fields.includes('fiscalMonth'))         record.fiscalMonth         = fiscalMonth;
-        if (fields.includes('calendarMonth'))       record.calendarMonth       = calendarMonth;
+        if (has('id'))                  record.id                  = i + 1;
+        if (has('accountType'))         record.accountType         = accountType;
+        if (has('fund'))                record.fund                = fund;
+        if (has('function'))            record['function']         = func;
+        if (has('department'))          record.department          = pick(departments, rng);
+        if (has('division'))            record.division            = division;
+        if (has('program'))             record.program             = program;
+        if (has('location'))            record.location            = location;
+        if (has('doeFunc'))             record.doeFunc             = doeFunc;
+        if (has('grade'))               record.grade               = grade;
+        if (has('object'))              record['object']           = object;
+        if (has('characterCode'))       record.characterCode       = generateRandomNumber(1, 9, rng).toString();
+        if (has('account'))             record.account             = acctNum;
+        if (has('fullAccount'))         record.fullAccount         = fullAccount;
+        if (has('accountDescription')) record.accountDescription   = accountDescription;
+        if (has('fiscalCalendarName')) record.fiscalCalendarName   = fiscalCalendarName;
+        if (has('fiscalYear'))          record.fiscalYear          = fiscalYear;
+        if (has('fiscalMonth'))         record.fiscalMonth         = fiscalMonth;
+        if (has('calendarMonth'))       record.calendarMonth       = calendarMonth;
         break;
       }
 
