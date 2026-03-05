@@ -21,3 +21,6 @@ dist
 .mcp
 .playwright-mcp
 .vite
+
+# Local Netlify folder
+.netlify
